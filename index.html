@@ -128,10 +128,6 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
 @media(max-width:600px){.chart-container{padding:12px 8px}.kpi-row{grid-template-columns:1fr 1fr}.table-controls{flex-direction:column}.table-search{width:100%}}
 @media(max-width:768px){.filter-grid{grid-template-columns:1fr 1fr}.kpi-row{grid-template-columns:repeat(2,1fr)}.login-card{width:95%;padding:24px 18px}}
 
-/* ── Talent + Informe tabs ── */
-.tab-btn.active-talent{color:#22a06b;border-bottom-color:#22a06b}
-.tab-btn.active-informe{color:#7E63A0;border-bottom-color:#7E63A0}
-
 /* ── Informe Mensual redesign ── */
 .inf-wrap{padding:0 0 80px}
 .inf-hero{background:#fff;padding:28px 32px;margin:14px 14px 0;border-radius:16px;border:1px solid #f0f0f0;box-shadow:0 2px 12px rgba(0,0,0,.04);position:relative;overflow:hidden}
@@ -203,6 +199,124 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
 .inf-news-save-btn{background:#E97132;color:#fff;border:none;padding:7px 16px;border-radius:7px;font-size:.76rem;cursor:pointer;font-weight:600}
 .inf-news-cancel-btn{background:#eee;color:#888;border:none;padding:7px 14px;border-radius:7px;font-size:.76rem;cursor:pointer}
 .inf-retry-btn{background:#AE90C3;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:.82rem;cursor:pointer;font-weight:600;margin-top:12px}
+
+/* ── GANTT / SEGUIMIENTO TAB ── */
+.tab-btn.active-gantt{color:#22a06b;border-bottom-color:#22a06b}
+.gantt-wrap{padding:0 0 80px;background:#f8f9fa;min-height:100vh}
+.gantt-hero{background:#fff;margin:14px 14px 0;border-radius:16px;padding:22px 28px;box-shadow:0 2px 12px rgba(0,0,0,.05);border:1px solid #f0f0f0;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.gantt-hero-left .gantt-eyebrow{font-size:.62rem;font-weight:700;color:#22a06b;text-transform:uppercase;letter-spacing:3px;margin-bottom:4px}
+.gantt-hero-left h2{font-size:1.4rem;font-weight:900;color:#1a1a1a;letter-spacing:-.4px}
+.gantt-hero-left p{font-size:.82rem;color:#aaa;margin-top:3px}
+.gantt-hero-right{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-gantt-add{background:#22a06b;color:#fff;border:none;padding:9px 18px;border-radius:9px;font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s}
+.btn-gantt-add:hover{background:#1b8f5e}
+.btn-gantt-export{background:#f5f5f5;color:#666;border:1px solid #e0e0e0;padding:9px 16px;border-radius:9px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-gantt-export:hover{background:#EFE7F4;color:#7E63A0;border-color:#D4B8E8}
+
+/* Stats bar */
+.gantt-stats{display:flex;gap:10px;margin:10px 14px 0;flex-wrap:wrap}
+.gantt-stat-pill{background:#fff;border-radius:10px;padding:10px 16px;box-shadow:0 1px 6px rgba(0,0,0,.05);display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:600;color:#555;border:1px solid #f0f0f0}
+.gantt-stat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Filters */
+.gantt-filters{background:#fff;margin:10px 14px 0;border-radius:12px;padding:14px 18px;box-shadow:0 1px 6px rgba(0,0,0,.04);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.gantt-filter-label{font-size:.7rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.gantt-filter-select{padding:6px 10px;border:1.5px solid #e5e5e5;border-radius:7px;font-size:.8rem;background:#fff;outline:none;cursor:pointer;font-family:'Inter',sans-serif;color:#333;min-width:130px}
+.gantt-filter-select:focus{border-color:#22a06b}
+.gantt-search{padding:7px 11px;border:1.5px solid #e5e5e5;border-radius:7px;font-size:.8rem;outline:none;font-family:'Inter',sans-serif;width:220px}
+.gantt-search:focus{border-color:#22a06b}
+
+/* Timeline container */
+.gantt-timeline{background:#fff;margin:10px 14px 0;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.05);border:1px solid #f0f0f0;overflow:hidden}
+.gantt-timeline-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #f0f0f0;flex-wrap:wrap;gap:8px}
+.gantt-timeline-title{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#888;display:flex;align-items:center;gap:8px}
+.gantt-nav{display:flex;align-items:center;gap:6px}
+.gantt-nav button{background:#f5f5f5;border:1px solid #e0e0e0;color:#666;padding:5px 10px;border-radius:6px;font-size:.78rem;cursor:pointer;font-weight:600;transition:all .15s}
+.gantt-nav button:hover{background:#e8f5ef;border-color:#22a06b;color:#22a06b}
+.gantt-current-period{font-size:.78rem;font-weight:700;color:#1a1a1a;min-width:140px;text-align:center}
+.gantt-view-toggle{display:flex;gap:4px}
+.gantt-view-btn{padding:5px 10px;border-radius:6px;font-size:.74rem;font-weight:600;cursor:pointer;border:1px solid #e0e0e0;background:#f5f5f5;color:#888;transition:all .15s}
+.gantt-view-btn.active{background:#22a06b;color:#fff;border-color:#22a06b}
+
+/* Table+chart area */
+.gantt-scroll-area{overflow-x:auto;overflow-y:auto;max-height:620px}
+.gantt-table{border-collapse:collapse;width:100%;min-width:900px;font-size:.78rem}
+.gantt-table th{background:#fafafa;padding:9px 10px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#999;border-bottom:2px solid #f0f0f0;white-space:nowrap;position:sticky;top:0;z-index:5}
+.gantt-table th.gt-task{min-width:220px;max-width:280px;position:sticky;left:0;z-index:6;background:#fafafa}
+.gantt-table td{padding:0;border-bottom:1px solid #f5f5f5;vertical-align:middle}
+.gantt-table td.gt-task-cell{padding:10px 12px;position:sticky;left:0;background:#fff;z-index:3;border-right:2px solid #f0f0f0;min-width:220px;max-width:280px}
+.gantt-table tr:hover td{background:#f9fdf9}
+.gantt-table tr:hover td.gt-task-cell{background:#f9fdf9}
+.gantt-task-name{font-weight:600;color:#1a1a1a;line-height:1.3;word-break:break-word}
+.gantt-task-meta{font-size:.67rem;color:#aaa;margin-top:2px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.gantt-flag{font-size:.85rem}
+.gantt-assignee{background:#f5f5f5;padding:1px 6px;border-radius:4px;font-weight:500;color:#666}
+.gantt-prio-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block}
+
+/* Day/Week header cells */
+.gt-day-hdr{text-align:center;min-width:28px;font-size:.6rem;padding:9px 3px !important;user-select:none}
+.gt-day-hdr.today-hdr{color:#22a06b;font-weight:900}
+.gt-day-hdr.weekend{color:#ddd}
+
+/* Bar cells */
+.gt-bar-cell{min-width:28px;height:48px;position:relative;padding:0 !important}
+.gt-bar-fill{position:absolute;top:50%;transform:translateY(-50%);height:18px;border-radius:9px;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:center;overflow:hidden;min-width:4px}
+.gt-bar-fill:hover{opacity:.82;filter:brightness(1.05)}
+.gt-bar-fill span{font-size:.6rem;color:#fff;font-weight:700;white-space:nowrap;padding:0 5px;pointer-events:none}
+.gt-bar-fill.bar-green{background:linear-gradient(90deg,#22a06b,#34c785)}
+.gt-bar-fill.bar-orange{background:linear-gradient(90deg,#E97132,#F5A874)}
+.gt-bar-fill.bar-purple{background:linear-gradient(90deg,#AE90C3,#C9B1D9)}
+.gt-bar-fill.bar-blue{background:linear-gradient(90deg,#3B82F6,#60A5FA)}
+.gt-bar-fill.bar-red{background:linear-gradient(90deg,#EF4444,#F87171)}
+.gt-bar-fill.bar-yellow{background:linear-gradient(90deg,#F5A623,#FDD835)}
+.gt-bar-fill.bar-gray{background:linear-gradient(90deg,#9CA3AF,#D1D5DB)}
+.gt-today-line{position:absolute;top:0;bottom:0;width:2px;background:#22a06b;opacity:.5;pointer-events:none;z-index:2}
+
+/* Status badge */
+.gantt-status{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:10px;font-size:.66rem;font-weight:700;white-space:nowrap}
+.gs-pending{background:#FEF9C3;color:#854D0E}
+.gs-inprogress{background:#DBEAFE;color:#1E40AF}
+.gs-done{background:#DCFCE7;color:#166534}
+.gs-blocked{background:#FEE2E2;color:#991B1B}
+.gs-review{background:#EFE7F4;color:#7E63A0}
+
+/* Priority colors */
+.gp-high{color:#EF4444}.gp-mid{color:#F5A623}.gp-low{color:#22a06b}
+
+/* Add/Edit Modal */
+.gantt-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px}
+.gantt-modal{background:#fff;border-radius:16px;width:540px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.18)}
+.gantt-modal-header{padding:20px 24px 14px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+.gantt-modal-header h3{font-size:1rem;font-weight:800;color:#1a1a1a}
+.gantt-modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:#aaa;line-height:1;padding:0}
+.gantt-modal-body{padding:20px 24px}
+.gantt-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.gantt-form-row.full{grid-template-columns:1fr}
+.gantt-field label{display:block;font-size:.68rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.gantt-field input,.gantt-field select,.gantt-field textarea{width:100%;padding:9px 11px;border:1.5px solid #eee;border-radius:8px;font-size:.82rem;font-family:'Inter',sans-serif;color:#333;outline:none;transition:border .2s;background:#fff}
+.gantt-field input:focus,.gantt-field select:focus,.gantt-field textarea:focus{border-color:#22a06b}
+.gantt-field textarea{resize:vertical;min-height:60px}
+.gantt-flag-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.gantt-flag-btn{padding:5px 10px;border-radius:7px;border:1.5px solid #e0e0e0;background:#f5f5f5;cursor:pointer;font-size:.82rem;transition:all .15s;user-select:none}
+.gantt-flag-btn.selected{border-color:#22a06b;background:#e8f5ef}
+.gantt-modal-footer{padding:14px 24px 20px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #f0f0f0}
+.btn-gantt-save{background:#22a06b;color:#fff;border:none;padding:10px 22px;border-radius:9px;font-size:.84rem;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-gantt-save:hover{background:#1b8f5e}
+.btn-gantt-delete{background:#FEE2E2;color:#991B1B;border:none;padding:10px 16px;border-radius:9px;font-size:.84rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-gantt-delete:hover{background:#FECACA}
+.btn-gantt-cancel{background:#f5f5f5;color:#888;border:none;padding:10px 16px;border-radius:9px;font-size:.84rem;font-weight:600;cursor:pointer}
+
+/* Empty state */
+.gantt-empty{text-align:center;padding:60px 20px;color:#ccc}
+.gantt-empty .ge-icon{font-size:2.8rem;margin-bottom:12px}
+.gantt-empty p{font-size:.88rem;line-height:1.7;color:#bbb}
+
+/* Responsive */
+@media(max-width:768px){
+  .gantt-hero{flex-direction:column}
+  .gantt-form-row{grid-template-columns:1fr}
+  .gantt-search{width:100%}
+}
 </style>
 </head>
 <body>
@@ -254,18 +368,6 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
         <div class="upload-info" id="uiCurs"><strong id="uiCursName"></strong><span id="uiCursSize" style="color:#aaa"></span></div>
       </div>
     </div>
-    <!-- Talent Mapping Upload -->
-    <div style="margin-top:14px;padding-top:14px;border-top:1px dashed #e5e5e5">
-      <div style="font-size:.82rem;font-weight:600;color:#22a06b;margin-bottom:8px">🎯 Talent Mapping</div>
-      <div class="upload-zone" id="uzTalent" style="border-color:#22a06b22;background:#f0faf5">
-        <div style="font-size:.82rem;color:#22a06b">Arrastrá el archivo de Talent Mapping aquí</div>
-        <div style="font-size:.72rem;color:#aaa;margin-top:4px">Excel o CSV con columnas: LEGAJO, MATCH CULTURAL, POTENCIAL DE DESARROLLO</div>
-        <input type="file" id="fiTalent" accept=".xlsx,.xls,.csv" style="display:none">
-      </div>
-      <div id="uiTalent" style="display:none;margin-top:6px;font-size:.78rem;color:#22a06b">
-        ✓ <span id="uiTalentName"></span><span id="uiTalentSize" style="color:#aaa"></span>
-      </div>
-    </div>
     <div id="modalStorageInfo" style="margin-top:12px;background:#f8f8f8;border-radius:8px;padding:10px 14px;font-size:.76rem;color:#666;line-height:1.7"></div>
     <!-- Access log - only shown to global -->
     <div id="accessLogSection" style="display:none;margin-top:14px;border-top:1px dashed #e5e5e5;padding-top:14px">
@@ -301,6 +403,7 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
   <div class="tab-nav">
     <button class="tab-btn active-prog" id="tabBtnProg">Programas</button>
     <button class="tab-btn" id="tabBtnCurs">Cursos</button>
+    <button class="tab-btn" id="tabBtnGantt" style="display:none">📋 Seguimiento</button>
   </div>
   <!-- TAB PROGRAMAS -->
   <div class="tab-content active" id="tabProg">
@@ -428,14 +531,205 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
     </div>
   </div>
 
+  <!-- TAB GANTT / SEGUIMIENTO — visible solo para global -->
+  <div class="tab-content" id="tabGantt" style="display:none">
+    <div class="gantt-wrap">
 
+      <!-- Hero -->
+      <div class="gantt-hero">
+        <div class="gantt-hero-left">
+          <h2>📋 Plan de Seguimiento | Proyectos y tareas equipo training</h2>
+          <p>Gestión de tareas y deadlines por equipo de entrenamiento — solo visible para training managers y global</p>
+        </div>
+        <div class="gantt-hero-right">
+          <button class="btn-gantt-export" onclick="ganttExportCSV()">⬇ Exportar CSV</button>
+          <button class="btn-gantt-add" onclick="ganttOpenModal()">+ Nueva tarea</button>
+        </div>
+      </div>
+
+      <!-- Stats pills -->
+      <div class="gantt-stats" id="ganttStats"></div>
+
+      <!-- Filters -->
+      <div class="gantt-filters">
+        <span class="gantt-filter-label">Filtrar:</span>
+        <select class="gantt-filter-select" id="ganttFPais" onchange="ganttRender()">
+          <option value="">Todos los países</option>
+          <option value="🇦🇷">🇦🇷 Argentina</option>
+          <option value="🇨🇱">🇨🇱 Chile</option>
+          <option value="🇲🇽">🇲🇽 México</option>
+          <option value="🇵🇪">🇵🇪 Perú</option>
+          <option value="🌎">🌎 XTC (CM)</option>
+        </select>
+        <select class="gantt-filter-select" id="ganttFStatus" onchange="ganttRender()">
+          <option value="">Todos los estados</option>
+          <option value="pending">Pendiente</option>
+          <option value="inprogress">En progreso</option>
+          <option value="review">En revisión</option>
+          <option value="done">Completado</option>
+        </select>
+        <select class="gantt-filter-select" id="ganttFPrio" onchange="ganttRender()">
+          <option value="">Todas las prioridades</option>
+          <option value="high">🔴 Alta</option>
+          <option value="mid">🟡 Media</option>
+          <option value="low">🟢 Baja</option>
+        </select>
+        <input type="text" class="gantt-search" id="ganttSearch" placeholder="Buscar tarea o responsable..." oninput="ganttRender()">
+        <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+          <span class="gantt-filter-label">Vista:</span>
+          <div class="gantt-view-toggle">
+            <button class="gantt-view-btn active" id="ganttVWeek" onclick="ganttSetView('week')">Semana</button>
+            <button class="gantt-view-btn" id="ganttVMonth" onclick="ganttSetView('month')">Mes</button>
+            <button class="gantt-view-btn" id="ganttVQuarter" onclick="ganttSetView('quarter')">Trimestre</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="gantt-timeline">
+        <div class="gantt-timeline-header">
+          <div class="gantt-timeline-title">🗓 Línea de tiempo</div>
+          <div class="gantt-nav">
+            <button onclick="ganttNav(-1)">&#8592; Anterior</button>
+            <span class="gantt-current-period" id="ganttPeriodLabel"></span>
+            <button onclick="ganttNav(1)">Siguiente &#8594;</button>
+            <button onclick="ganttGoToday()" style="background:#e8f5ef;color:#22a06b;border-color:#22a06b">Hoy</button>
+          </div>
+        </div>
+        <div class="gantt-scroll-area">
+          <div id="ganttTableWrap"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="gantt-modal-overlay" id="ganttModal" style="display:none" onclick="ganttModalBgClick(event)">
+      <div class="gantt-modal" onclick="event.stopPropagation()">
+        <div class="gantt-modal-header">
+          <h3 id="ganttModalTitle">Nueva tarea</h3>
+          <button class="gantt-modal-close" onclick="ganttCloseModal()">&times;</button>
+        </div>
+        <div class="gantt-modal-body">
+          <input type="hidden" id="ganttEditId">
+          <div class="gantt-form-row full">
+            <div class="gantt-field">
+              <label>Nombre de la tarea *</label>
+              <input type="text" id="gfName" placeholder="Ej: Lanzamiento módulo onboarding">
+            </div>
+          </div>
+          <div class="gantt-form-row">
+            <div class="gantt-field">
+              <label>Fecha inicio *</label>
+              <input type="date" id="gfStart">
+            </div>
+            <div class="gantt-field">
+              <label>Fecha deadline *</label>
+              <input type="date" id="gfEnd">
+            </div>
+          </div>
+          <div class="gantt-form-row">
+            <div class="gantt-field">
+              <label>Responsable</label>
+              <input type="text" id="gfAssignee" placeholder="Ej: María García">
+            </div>
+            <div class="gantt-field">
+              <label>Estado</label>
+              <select id="gfStatus">
+                <option value="pending">Pendiente</option>
+                <option value="inprogress">En progreso</option>
+                <option value="review">En revisión</option>
+                <option value="done">Completado</option>
+                <option value="blocked">Bloqueado</option>
+              </select>
+            </div>
+          </div>
+          <div class="gantt-form-row">
+            <div class="gantt-field">
+              <label>Prioridad</label>
+              <select id="gfPrio">
+                <option value="high">🔴 Alta</option>
+                <option value="mid">🟡 Media</option>
+                <option value="low">🟢 Baja</option>
+              </select>
+            </div>
+            <div class="gantt-field">
+              <label>Categoría</label>
+              <select id="gfCategory">
+                <option value="Programas">Programas</option>
+                <option value="Cursos">Cursos</option>
+                <option value="Onboarding">Onboarding</option>
+                <option value="Lanzamiento">Lanzamiento</option>
+                <option value="Reporte">Reporte</option>
+                <option value="Reunion">Reunión</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+          </div>
+          <div class="gantt-form-row full">
+            <div class="gantt-field">
+              <label>Países asignados</label>
+              <div class="gantt-flag-btns" id="gfFlagsWrap">
+                <button type="button" class="gantt-flag-btn" data-flag="🇦🇷" onclick="ganttToggleFlag(this)">🇦🇷 AR</button>
+                <button type="button" class="gantt-flag-btn" data-flag="🇨🇱" onclick="ganttToggleFlag(this)">🇨🇱 CL</button>
+                <button type="button" class="gantt-flag-btn" data-flag="🇲🇽" onclick="ganttToggleFlag(this)">🇲🇽 MX</button>
+                <button type="button" class="gantt-flag-btn" data-flag="🇵🇪" onclick="ganttToggleFlag(this)">🇵🇪 PE</button>
+                <button type="button" class="gantt-flag-btn" data-flag="🌎" onclick="ganttToggleFlag(this)">🌎 Global</button>
+              </div>
+            </div>
+          </div>
+          <div class="gantt-form-row full">
+            <div class="gantt-field">
+              <label>Notas / descripción</label>
+              <textarea id="gfNotes" placeholder="Contexto adicional, links, etc."></textarea>
+            </div>
+          </div>
+          <div class="gantt-form-row">
+            <div class="gantt-field">
+              <label>% Completado</label>
+              <input type="number" id="gfProgress" min="0" max="100" value="0" placeholder="0-100">
+            </div>
+            <div class="gantt-field">
+              <label>Color de barra</label>
+              <select id="gfColor">
+                <option value="bar-green">🟢 Verde</option>
+                <option value="bar-orange">🟠 Naranja</option>
+                <option value="bar-purple">🟣 Violeta</option>
+                <option value="bar-blue">🔵 Azul</option>
+                <option value="bar-red">🔴 Rojo</option>
+                <option value="bar-yellow">🟡 Amarillo</option>
+                <option value="bar-gray">⚫ Gris</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="gantt-modal-footer">
+          <button class="btn-gantt-delete" id="ganttBtnDelete" style="display:none;margin-right:auto" onclick="ganttDeleteTask()">Eliminar</button>
+          <button class="btn-gantt-cancel" onclick="ganttCloseModal()">Cancelar</button>
+          <button class="btn-gantt-save" onclick="ganttSaveTask()">Guardar tarea</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
 
 </div>
 <script>
 // ============================================================
 // GLOBALS
 // ============================================================
-var LOGINS={global:{pass:'global2024',cf:null},argentina:{pass:'argentina123',cf:['ARGENTINA']},chile:{pass:'chile123',cf:['CHILE']},mexico:{pass:'mexico123',cf:['MEXICO']},peru:{pass:'peru123',cf:['PERU']}};
+var LOGINS={
+  global:{pass:'global2024',cf:null,training:true,pais:null},
+  argentina:{pass:'argentina123',cf:['ARGENTINA']},
+  chile:{pass:'chile123',cf:['CHILE']},
+  mexico:{pass:'mexico123',cf:['MEXICO']},
+  peru:{pass:'peru123',cf:['PERU']},
+  'training.ar':{pass:'argentina123',cf:['ARGENTINA'],training:true,pais:'🇦🇷'},
+  'training.cl':{pass:'chile123',cf:['CHILE'],training:true,pais:'🇨🇱'},
+  'training.mx':{pass:'mexico123',cf:['MEXICO'],training:true,pais:'🇲🇽'},
+  'training.pe':{pass:'peru123',cf:['PERU'],training:true,pais:'🇵🇪'}
+};
+var USER_LABELS={global:'Global',argentina:'Argentina',chile:'Chile',mexico:'México',peru:'Perú','training.ar':'Training AR','training.cl':'Training CL','training.mx':'Training MX','training.pe':'Training PE'};
 var BASE={orange:'#E97132',purple:'#AE90C3',yellow:'#F5F378'};
 var CF=null,CU=null,PS=50;
 var P_SORT={col:null,dir:0}; // col=field name, dir=0 none,1 asc,-1 desc
@@ -475,17 +769,6 @@ function handleSort(th, sortState, renderFn){
     sortState.col=col; sortState.dir=1;
   }
   renderFn();
-}
-
-function toggleCStaff(){
-  var chk=g('cStaffToggleChk'),badge=g('cStaffBadge'),bar=g('cStaffToggleBar');
-  if(chk) chk.checked=!chk.checked;
-  var isExcluded=chk&&!chk.checked;
-  if(badge) badge.textContent=isExcluded?'excluido':'activo';
-  if(bar){ bar.style.background=isExcluded?'#EFE7F4':'#FEF0E7'; bar.style.borderColor=isExcluded?'#D4B8E8':'#F2C860'; bar.style.color=isExcluded?'#7E63A0':'#A45F2B'; }
-  if(badge) badge.style.background=isExcluded?'#AE90C3':'#E97132';
-  EXCLUDE_STAFF_C=isExcluded;
-  cDoFilter();
 }
 
 function toggleStaff(){
@@ -870,6 +1153,7 @@ function doLogin(){
   var p=g('loginPass').value.trim();
   if(LOGINS[u]&&LOGINS[u].pass===p){
     CF=LOGINS[u].cf;CU=u;
+    try{localStorage.setItem('xtc_session_user',u);}catch(e){}
     g('loginError').style.display='none';
     enterDash();
   }else{
@@ -877,9 +1161,10 @@ function doLogin(){
   }
 }
 function doLogout(){
-  // Clear in-memory state only — localStorage persists for next login
+  // Clear in-memory state only — localStorage data cache persists for next login
   P=makeState(P.cfg);C=makeState(C.cfg);
   pendProg=null;pendCurs=null;CF=null;CU=null;
+  try{localStorage.removeItem('xtc_session_user');}catch(e){}
   g('dashboardScreen').style.display='none';
   g('loginScreen').style.display='flex';
   g('loginUser').value='';g('loginPass').value='';
@@ -904,7 +1189,7 @@ function logAccess(){
 function enterDash(){
   g('loginScreen').style.display='none';
   g('dashboardScreen').style.display='block';
-  g('userBadge').textContent=CU.charAt(0).toUpperCase()+CU.slice(1);
+  g('userBadge').textContent=USER_LABELS[CU]||(CU.charAt(0).toUpperCase()+CU.slice(1));
   logAccess();
   // Show correct info bar based on role
   var isGlobal = (CU==='global');
@@ -925,39 +1210,36 @@ function enterDash(){
 // TABS
 // ============================================================
 function showTabProg(){
-  ['tabTalent','tabProg','tabCurs','tabInforme'].forEach(function(id){
+  ['tabProg','tabCurs'].forEach(function(id){
     var el=g(id);if(el){el.classList.remove('active');el.style.display='none';}
   });
+  var ganttEl=g('tabGantt');if(ganttEl)ganttEl.style.display='none';
   var el=g('tabProg');if(el){el.classList.add('active');el.style.display='block';}
   g('tabBtnProg').className='tab-btn active-prog';g('tabBtnCurs').className='tab-btn';
-  
+  var gb=g('tabBtnGantt');if(gb&&gb.style.display!=='none')gb.className='tab-btn';
   setTimeout(function(){['pC1','pC2','pC3','pC4'].forEach(function(id){var el=document.getElementById(id);if(el&&el.data)Plotly.Plots.resize(el);});},50);
 }
 function showTabCurs(){
-  ['tabTalent','tabProg','tabCurs','tabInforme'].forEach(function(id){
+  ['tabProg','tabCurs'].forEach(function(id){
     var el=g(id);if(el){el.classList.remove('active');el.style.display='none';}
   });
   var el=g('tabCurs');if(el){el.classList.add('active');el.style.display='block';}
   g('tabBtnCurs').className='tab-btn active-curs';g('tabBtnProg').className='tab-btn';
-  
+  var gb=g('tabBtnGantt');if(gb&&gb.style.display!=='none')gb.className='tab-btn';
   setTimeout(function(){['cC1','cC2','cC3','cC4'].forEach(function(id){var el=document.getElementById(id);if(el&&el.data)Plotly.Plots.resize(el);});},50);
 }
-function showTabTalent(){
-  ['tabTalent','tabProg','tabCurs','tabInforme'].forEach(function(id){
+function showTabGantt(){
+  ['tabProg','tabCurs'].forEach(function(id){
     var el=g(id);if(el){el.classList.remove('active');el.style.display='none';}
   });
-  var el=g('tabTalent');if(el){el.classList.add('active');el.style.display='block';}
-  g('tabBtnProg').className='tab-btn';g('tabBtnCurs').className='tab-btn';
-  if(g('tNoData'))g('tNoData').style.display='block';if(g('tMain'))g('tMain').style.display='none';
+  var ganttEl=g('tabGantt');if(ganttEl)ganttEl.style.display='block';
+  g('tabBtnProg').className='tab-btn';
+  g('tabBtnCurs').className='tab-btn';
+  var gb=g('tabBtnGantt');if(gb)gb.className='tab-btn active-gantt';
+  ganttRender();
 }
-function showTabInforme(){
-  ['tabTalent','tabProg','tabCurs','tabInforme'].forEach(function(id){
-    var el=g(id);if(el){el.classList.remove('active');el.style.display='none';}
-  });
-  var el=g('tabInforme');if(el){el.classList.add('active');el.style.display='block';}
-  g('tabBtnProg').className='tab-btn';g('tabBtnCurs').className='tab-btn';
-  renderInforme();
-}
+
+
 function refreshTabProg(){
   if(P.raw.length>0){
     g('pNoData').style.display='none';g('pMain').style.display='block';
@@ -1043,16 +1325,9 @@ function setUpFile(file,isProg){
   if(isProg){pendProg=file;g('uiProgName').textContent=file.name;g('uiProgSize').textContent=' - '+sz;g('uiProg').style.display='block';}
   else{pendCurs=file;g('uiCursName').textContent=file.name;g('uiCursSize').textContent=' - '+sz;g('uiCurs').style.display='block';}
 }
-var pendTalent=null;
-function setTalentFile(file){
-  if(!file.name.match(/\.(xlsx|xls|csv)$/i)){alert('Selecciona un archivo Excel o CSV');return;}
-  pendTalent=file;
-  g('uiTalentName').textContent=file.name;
-  g('uiTalentSize').textContent=' - '+(file.size/1024).toFixed(1)+' KB';
-  g('uiTalent').style.display='block';
-}
+
 function applyUploads(){
-  if(!pendProg&&!pendCurs&&!pendTalent){alert('Selecciona al menos un archivo.');return;}
+  if(!pendProg&&!pendCurs){alert('Selecciona al menos un archivo.');return;}
   closeModal();
   g('loadingOverlay').style.display='flex';
   g('loadingText').textContent='Procesando archivos...';
@@ -1067,16 +1342,7 @@ function processQueue(queue,idx){
     g('loadingOverlay').style.display='none';
     refreshTabProg();refreshTabCurs();
     // Process talent if pending
-    if(pendTalent){
-      var tf=pendTalent; pendTalent=null;
-      g('loadingOverlay').style.display='flex';
-      g('loadingText').textContent='Procesando Talent Mapping...';
-      readExcelRaw(tf, function(rows){
-        g('loadingOverlay').style.display='none';
-        processTalentData(rows);
-        showTabTalent();
-      });
-    }
+
     return;
   }
   setTimeout(function(){readExcel(queue[idx].file,queue[idx].isProg,function(){processQueue(queue,idx+1);});},50);
@@ -1134,27 +1400,7 @@ function parseCSVtext(text){
 }
 
 // ── Main file reader: handles .xlsx, .xls AND .csv ─────────────
-function readExcelRaw(file, cb){
-  var isCSV=file.name.toLowerCase().endsWith('.csv');
-  var reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      var rows;
-      if(isCSV){
-        var text=e.target.result;
-        if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
-        rows=parseCSVtext(text);
-      }else{
-        var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true,cellNF:false,cellText:false});
-        var ws=wb.Sheets[wb.SheetNames[0]];
-        rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,dateNF:'dd/mm/yyyy'});
-      }
-      cb(rows);
-    }catch(err){ g('loadingOverlay').style.display='none'; alert('Error leyendo archivo: '+err.message); cb([]); }
-  };
-  reader.onerror=function(){g('loadingOverlay').style.display='none';alert('Error leyendo el archivo.');cb([]);};
-  isCSV?reader.readAsText(file,'UTF-8'):reader.readAsArrayBuffer(file);
-}
+
 function readExcel(file,isProg,cb){
   var isCSV=file.name.toLowerCase().endsWith('.csv');
   var reader=new FileReader();
@@ -2082,83 +2328,7 @@ function mapTalentRow(headers,row){
   var map={};for(var i=0;i<headers.length;i++)map[headers[i].toString().trim().toLowerCase().replace(/[^a-z0-9]/g,'')]=String(row[i]||'').trim();
   return{legajo:map['legajo']||map['nrodocumento']||map['id']||'',matchCult:map['matchcultural']||map['match']||'',potencial:map['potencialdedesarrollo']||map['potencial']||''};
 }
-function processTalentData(rows){
-  if(!rows||rows.length<2){alert('Archivo sin datos suficientes.');return;}
-  var headers=rows[0].map(function(h){return String(h||'').trim();});
-  var mapped=[];for(var i=1;i<rows.length;i++){var r=mapTalentRow(headers,rows[i]);if(r.legajo)mapped.push(r);}
-  var highPot=mapped.filter(function(r){return r.potencial.toUpperCase()==='SI';});
-  if(!highPot.length){alert('No se encontraron registros con Potencial de Desarrollo = SI.');return;}
-  var progByLegajo={};
-  P.raw.forEach(function(r){
-    if(!progByLegajo[r.legajo])progByLegajo[r.legajo]={nombre:r.nombre,posicion:r.posicion,programas:[],progTotal:0,progCount:0};
-    progByLegajo[r.legajo].programas.push(r.programa);
-    progByLegajo[r.legajo].progTotal+=r.progreso;progByLegajo[r.legajo].progCount++;
-  });
-  T.joined=highPot.map(function(t){
-    var p=progByLegajo[t.legajo];
-    var avgProg=p?Math.round(p.progTotal/p.progCount):null;
-    var progSet=p?[...new Set(p.programas)]:[];
-    var pendientes=p?progSet.filter(function(pr){return P.raw.filter(function(r){return r.legajo===t.legajo&&r.programa===pr;}).some(function(r){return r.estado!=='Completado';});}):[];
-    return{legajo:t.legajo,nombre:p?p.nombre:'(sin datos)',posicion:p?p.posicion:'',matchCult:t.matchCult,avgProg:avgProg,programas:progSet,pendientes:pendientes,hasData:!!p};
-  });
-  T.raw=highPot;T.page=1;
-  try{localStorage.setItem('xtc_talent',JSON.stringify({joined:T.joined,raw:T.raw}));}catch(e){}
-  refreshTabTalent();
-}
-function refreshTabTalent(){
-  // Always show Próximamente screen regardless of data
-  g('tNoData').style.display='block';g('tMain').style.display='none';return;
-  if(!T.joined.length){g('tNoData').style.display='block';g('tMain').style.display='none';return;}
-  g('tNoData').style.display='block';g('tMain').style.display='none';
-  var total=T.joined.length,withData=T.joined.filter(function(r){return r.hasData;});
-  var onboarding=T.joined.filter(function(r){return r.avgProg===100;}).length;
-  var avgProg=withData.length?Math.round(withData.reduce(function(s,r){return s+(r.avgProg||0);},0)/withData.length):0;
-  var noData=T.joined.filter(function(r){return !r.hasData;}).length;
-  g('tKpiTotal').textContent=total.toLocaleString();
-  g('tKpiOnboarding').textContent=total?Math.round(onboarding/total*100)+'%':'0%';
-  g('tKpiAvgProg').textContent=avgProg+'%';
-  g('tKpiPending').textContent=noData.toLocaleString();
-  renderTalentTable();
-}
-function renderTalentTable(){
-  var s=(g('tSearch')?g('tSearch').value:'').trim().toLowerCase();
-  var data=T.joined;
-  if(s)data=data.filter(function(r){return r.nombre.toLowerCase().indexOf(s)>=0||r.legajo.toLowerCase().indexOf(s)>=0;});
-  var tp=Math.ceil(data.length/T_PS);if(T.page>tp)T.page=tp||1;
-  var pd=data.slice((T.page-1)*T_PS,T.page*T_PS),h='';
-  pd.forEach(function(r){
-    var mc=r.matchCult.toUpperCase();
-    var mcClass=mc==='ALTO'?'talent-match-high':mc==='MEDIO'?'talent-match-mid':'talent-match-low';
-    var prog=r.avgProg!==null?'<div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:7px;background:#eee;border-radius:3px;overflow:hidden"><div style="width:'+r.avgProg+'%;height:100%;background:'+(r.avgProg>=70?'#22a06b':r.avgProg>=50?'#F5A874':'#E97132')+';border-radius:3px"></div></div><span style="font-size:.75rem">'+r.avgProg+'%</span></div>':'<span style="color:#ccc;font-size:.75rem">sin datos</span>';
-    var pend=r.pendientes.length?r.pendientes.map(function(p){return '<span style="background:#fde8db;color:#a45f2b;padding:2px 6px;border-radius:4px;font-size:.68rem;margin:1px 2px;display:inline-block">'+esc(trunc(p,25))+'</span>';}).join(''):'<span style="color:#22a06b;font-size:.75rem">✓ Sin pendientes</span>';
-    var estado=!r.hasData?'<span style="color:#ccc;font-size:.75rem">Sin registro</span>':r.pendientes.length===0?'<span class="talent-badge">Completo</span>':'<span style="background:#fde8db;color:#a45f2b;padding:2px 8px;border-radius:5px;font-size:.7rem;font-weight:600">'+r.pendientes.length+' pendiente(s)</span>';
-    h+='<tr><td>'+esc(r.legajo)+'</td><td style="font-weight:500">'+esc(r.nombre)+'</td><td style="font-size:.75rem" title="'+esc(r.posicion)+'">'+esc(trunc(r.posicion,24))+'</td><td><span class="'+mcClass+'">'+esc(r.matchCult||'-')+'</span></td><td>'+prog+'</td><td>'+estado+'</td><td>'+pend+'</td></tr>';
-  });
-  var tb=document.querySelector('#tTable tbody');if(tb)tb.innerHTML=h;
-  var div=g('tPag');if(!div)return;
-  if(tp<=1){div.innerHTML='';return;}
-  var ph='<button '+(T.page<=1?'disabled':'')+' onclick="T.page--;renderTalentTable()">← Ant</button>';
-  var s2=Math.max(1,T.page-3),e2=Math.min(tp,s2+6);
-  for(var i=s2;i<=e2;i++)ph+='<button class="'+(i===T.page?'active':'')+'" onclick="T.page='+i+';renderTalentTable()">'+i+'</button>';
-  ph+='<button '+(T.page>=tp?'disabled':'')+' onclick="T.page++;renderTalentTable()">Sig →</button>';
-  div.innerHTML=ph;
-}
-function exportTalent(){
-  var data=T.joined,nl='\n',hdr=['Legajo','Nombre','Posicion','Match Cultural','% Avance','Estado','Pendientes'];
-  var csv=hdr.map(function(h){return '"'+h+'"';}).join(',')+nl;
-  data.forEach(function(r){
-    var estado=!r.hasData?'Sin registro':r.pendientes.length===0?'Completo':r.pendientes.length+' pendiente(s)';
-    csv+=[r.legajo,r.nombre,r.posicion,r.matchCult,r.avgProg!==null?r.avgProg+'%':'sin datos',estado,r.pendientes.join(' | ')].map(function(c){return '"'+String(c||'').replace(/"/g,'""')+'"';}).join(',')+nl;
-  });
-  downloadCSV(csv,'talent_mapping_export.csv');
-}
-function restoreTalent(){
-  try{
-    var raw=localStorage.getItem('xtc_talent');if(!raw)return;
-    var parsed=JSON.parse(raw);
-    if(parsed&&parsed.joined&&parsed.joined.length){T.joined=parsed.joined;T.raw=parsed.raw||[];refreshTabTalent();}
-  }catch(e){}
-}
+
 function readExcelRaw(file,cb){
   var isCSV=file.name.toLowerCase().endsWith('.csv');
   var reader=new FileReader();
@@ -2193,96 +2363,10 @@ function getNews(){
   }catch(e){}
   return INF_DEFAULT_NEWS;
 }
-function saveNews(){
-  var ta=g('infNewsText');if(!ta)return;
-  var lines=ta.value.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
-  if(!lines.length){alert('Agregá al menos una noticia.');return;}
-  try{localStorage.setItem(INF_NEWS_KEY,JSON.stringify(lines));}catch(e){}
-  renderNewsTicker();
-  toggleNewsEditor();
-}
-function toggleNewsEditor(){
-  var ed=g('infNewsEditor'),ta=g('infNewsText');
-  if(!ed)return;
-  var open=ed.style.display==='block';
-  ed.style.display=open?'none':'block';
-  if(!open&&ta)ta.value=getNews().join('\n');
-}
-function renderNewsTicker(){
-  // Ticker bar: repeating "XTC NEWS" title
-  var track=g('infNewsTrack');
-  if(track){
-    var label='<span class="inf-news-ticker-item">XTC NEWS</span>';
-    track.innerHTML=label.repeat(20); // enough to fill any screen width
-  }
-  // Static news list below
-  var list=g('infNewsList');
-  if(list){
-    var news=getNews();
-    var icons=['📅','🚀','⭐','📌','🎯','✅','💡'];
-    list.innerHTML=news.map(function(n,i){
-      return '<div class="inf-news-list-item">'+
-        '<span class="inf-news-list-item-icon">'+icons[i%icons.length]+'</span>'+
-        '<span class="inf-news-list-item-text">'+esc(n)+'</span>'+
-        '</div>';
-    }).join('');
-  }
-}
+
 function showNewsEditBtn(){
   var btn=g('infNewsEditBtn');
   if(btn)btn.style.display=(CU==='global')?'block':'none';
-}
-
-function buildMonthOptions(){
-  var sel=g('infMonthSel');if(!sel)return;
-  var months={};
-  var MNAMES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  function addDate(d){
-    if(!d||d.getFullYear()<2026)return;
-    var y=d.getFullYear(),m=d.getMonth();
-    var key=y+'-'+String(m+1).padStart(2,'0');
-    months[key]={y:y,m:m,label:MNAMES[m]+' '+y};
-  }
-  P.raw.forEach(function(r){
-    addDate(r.fechaContrDate);  // for Onboarding
-    addDate(r.fechaFinDate);    // for other programs
-  });
-  var sorted=Object.keys(months).sort().reverse();
-  var cur=sel.value;
-  sel.innerHTML='<option value="all">Acumulado 2026</option>';
-  sorted.forEach(function(k){
-    var opt=document.createElement('option');
-    opt.value=k;opt.textContent=months[k].label;
-    if(k===cur)opt.selected=true;
-    sel.appendChild(opt);
-  });
-}
-
-function getInformeData(){
-  var sel=g('infMonthSel');
-  var period=sel?sel.value:'all';
-  // Base: all prog data from 2026 onwards
-  var progBase=P.raw.filter(function(r){
-    var d=r.fechaContrDate;
-    return !d||(d.getFullYear()>=2026);
-  });
-
-  function matchesPeriod(r){
-    if(period==='all')return true;
-    var parts=period.split('-');
-    var fy=parseInt(parts[0]),fm=parseInt(parts[1])-1;
-    var isOnb=r.programa&&r.programa.toUpperCase().indexOf('ONBOARDING')>=0;
-    if(isOnb){
-      // Onboarding: use fechaContrDate
-      return r.fechaContrDate&&r.fechaContrDate.getFullYear()===fy&&r.fechaContrDate.getMonth()===fm;
-    }else{
-      // Other programs: use fechaFinDate (completion date)
-      return r.fechaFinDate&&r.fechaFinDate.getFullYear()===fy&&r.fechaFinDate.getMonth()===fm;
-    }
-  }
-
-  var progData=period==='all'?progBase:progBase.filter(matchesPeriod);
-  return{prog:progData,curs:C.raw,period:period};
 }
 
 function calcPct(data){
@@ -2305,278 +2389,6 @@ function mkCountry(c,pct,comp,total){
     '<div class="inf-country-detail">'+comp+' de '+total+' completaron</div>'+
     '</div>';
 }
-
-function renderEvolutivo(){
-  var MNAMES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  var onbMonths={};
-
-  // Onboarding: group by fechaContrDate (ingresos del mes)
-  P.raw.filter(function(r){
-    return r.fechaContrDate&&r.fechaContrDate.getFullYear()>=2026&&
-           r.programa&&r.programa.toUpperCase().indexOf('ONBOARDING')>=0;
-  }).forEach(function(r){
-    var y=r.fechaContrDate.getFullYear(),m=r.fechaContrDate.getMonth();
-    var k=y+'-'+String(m+1).padStart(2,'0');
-    if(!onbMonths[k])onbMonths[k]={c:0,t:0,label:MNAMES[m]+' '+y};
-    onbMonths[k].t++;
-    if(r.estado==='Completado')onbMonths[k].c++;
-  });
-
-  var sorted=Object.keys(onbMonths).sort();
-  var el=g('infEvChart');
-  if(sorted.length<1){
-    if(el)el.innerHTML='<div style="text-align:center;padding:40px;color:#ccc;font-size:.82rem">Sin datos de Onboarding desde Enero 2026.</div>';
-    return;
-  }
-  var labels=sorted.map(function(k){return onbMonths[k].label;});
-  var vals=sorted.map(function(k){return Math.round(onbMonths[k].c/onbMonths[k].t*100);});
-  var colors=vals.map(function(v){return v>=70?'#22a06b':v>=50?'#F5A874':'#E97132';});
-
-  Plotly.newPlot('infEvChart',[{
-    type:'scatter',mode:'lines+markers+text',
-    x:labels,y:vals,
-    line:{color:'#E97132',width:2.5},
-    marker:{color:colors,size:9,line:{color:'#fff',width:2}},
-    text:vals.map(function(v){return v+'%';}),
-    textposition:'top center',
-    textfont:{size:11,color:'#555',family:'Inter'},
-    fill:'tozeroy',fillcolor:'rgba(233,113,50,.06)',
-    hovertemplate:'<b>%{x}</b><br>Completitud Onboarding: %{y}%<extra></extra>'
-  }],{
-    margin:{t:30,b:40,l:45,r:20},
-    yaxis:{range:[0,115],ticksuffix:'%',gridcolor:'#f5f5f5',zeroline:false},
-    xaxis:{gridcolor:'#f5f5f5'},
-    plot_bgcolor:'#fff',paper_bgcolor:'#fff',
-    font:{family:'Inter',size:11},
-    showlegend:false
-  },{responsive:true,displayModeBar:false});
-}
-function renderCxEvolutivo(){
-  var MNAMES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  var cxMonths={};
-
-  // CX Expert: group by fechaFinDate (completion date)
-  P.raw.filter(function(r){
-    return r.fechaFinDate&&r.fechaFinDate.getFullYear()>=2026&&
-           r.programa&&r.programa.toUpperCase().indexOf('CX')>=0&&
-           r.programa.toUpperCase().indexOf('EXPERT')>=0;
-  }).forEach(function(r){
-    var y=r.fechaFinDate.getFullYear(),m=r.fechaFinDate.getMonth();
-    var k=y+'-'+String(m+1).padStart(2,'0');
-    if(!cxMonths[k])cxMonths[k]={c:0,t:0,label:MNAMES[m]+' '+y};
-    cxMonths[k].t++;
-    if(r.estado==='Completado')cxMonths[k].c++;
-  });
-
-  var sorted=Object.keys(cxMonths).sort();
-  var el=g('infCxEvChart');
-  if(sorted.length<1){
-    if(el)el.innerHTML='<div style="text-align:center;padding:30px;color:#ccc;font-size:.82rem">Sin datos de CX Expert desde Enero 2026.</div>';
-    return;
-  }
-  var labels=sorted.map(function(k){return cxMonths[k].label;});
-  var vals=sorted.map(function(k){return Math.round(cxMonths[k].c/cxMonths[k].t*100);});
-  var colors=vals.map(function(v){return v>=70?'#22a06b':v>=50?'#F5A874':'#AE90C3';});
-
-  Plotly.newPlot('infCxEvChart',[{
-    type:'scatter',mode:'lines+markers+text',
-    x:labels,y:vals,
-    line:{color:'#AE90C3',width:2.5},
-    marker:{color:colors,size:9,line:{color:'#fff',width:2}},
-    text:vals.map(function(v){return v+'%';}),
-    textposition:'top center',
-    textfont:{size:11,color:'#555',family:'Inter'},
-    fill:'tozeroy',fillcolor:'rgba(174,144,195,.07)',
-    hovertemplate:'<b>%{x}</b><br>Completitud CX Expert: %{y}%<extra></extra>'
-  }],{
-    margin:{t:30,b:40,l:45,r:20},
-    yaxis:{range:[0,115],ticksuffix:'%',gridcolor:'#f5f5f5',zeroline:false},
-    xaxis:{gridcolor:'#f5f5f5'},
-    plot_bgcolor:'#fff',paper_bgcolor:'#fff',
-    font:{family:'Inter',size:11},
-    showlegend:false
-  },{responsive:true,displayModeBar:false});
-}
-function renderRecorrido(d){
-  var PROG_REC='MI RECORRIDO DE APRENDIZAJE';
-  var MNAMES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  var recMonths={};
-
-  // Find the exact program name (flexible match)
-  var recData=d.prog.filter(function(r){
-    return r.programa&&r.programa.toUpperCase().indexOf('RECORRIDO')>=0&&
-           r.programa.toUpperCase().indexOf('TIENDA')>=0;
-  });
-
-  // Global pct
-  var recG=calcPct(recData);
-  if(g('infRecPct'))g('infRecPct').innerHTML=recG.pct+'<span>% global</span>';
-
-  // Evolutivo by fechaFinDate
-  recData.filter(function(r){
-    return r.fechaFinDate&&r.fechaFinDate.getFullYear()>=2026;
-  }).forEach(function(r){
-    var y=r.fechaFinDate.getFullYear(),m=r.fechaFinDate.getMonth();
-    var k=y+'-'+String(m+1).padStart(2,'0');
-    if(!recMonths[k])recMonths[k]={c:0,t:0,label:MNAMES[m]+' '+y};
-    recMonths[k].t++;
-    if(r.estado==='Completado')recMonths[k].c++;
-  });
-
-  var sorted=Object.keys(recMonths).sort();
-  var chartEl=g('infRecChart');
-  if(!chartEl)return;
-
-  if(!recData.length){
-    chartEl.innerHTML='<div style="text-align:center;padding:30px;color:#ccc;font-size:.82rem">Sin datos del programa Mi Recorrido de Aprendizaje.</div>';
-    return;
-  }
-  if(sorted.length<1){
-    chartEl.innerHTML='<div style="text-align:center;padding:30px;color:#ccc;font-size:.82rem">Sin evolutivo disponible — se necesitan datos con fecha de finalización.</div>';
-    return;
-  }
-
-  var labels=sorted.map(function(k){return recMonths[k].label;});
-  var vals=sorted.map(function(k){return Math.round(recMonths[k].c/recMonths[k].t*100);});
-  var colors=vals.map(function(v){return v>=70?'#22a06b':v>=50?'#F5A874':'#F5C842';});
-
-  Plotly.newPlot('infRecChart',[{
-    type:'scatter',mode:'lines+markers+text',
-    x:labels,y:vals,
-    line:{color:'#F5C842',width:2.5},
-    marker:{color:colors,size:9,line:{color:'#fff',width:2}},
-    text:vals.map(function(v){return v+'%';}),
-    textposition:'top center',
-    textfont:{size:11,color:'#555'},
-    fill:'tozeroy',fillcolor:'rgba(245,200,66,.07)',
-    hovertemplate:'<b>%{x}</b><br>Mi Recorrido: %{y}%<extra></extra>'
-  }],{
-    margin:{t:30,b:40,l:45,r:20},
-    yaxis:{range:[0,115],ticksuffix:'%',gridcolor:'#f5f5f5',zeroline:false},
-    xaxis:{gridcolor:'#f5f5f5'},
-    plot_bgcolor:'#fff',paper_bgcolor:'#fff',
-    font:{family:'Inter',size:11},
-    showlegend:false
-  },{responsive:true,displayModeBar:false});
-}
-function renderVmAcademy(d){
-  var COUNTRIES=['ARGENTINA','CHILE','MEXICO','PERU'];
-  var FLAGS={'ARGENTINA':'🇦🇷','CHILE':'🇨🇱','MEXICO':'🇲🇽','PERU':'🇵🇪'};
-
-  var vmData=d.prog.filter(function(r){
-    return r.programa&&r.programa.toUpperCase().indexOf('VM ACADEMY')>=0;
-  });
-
-  // Get unique VM programs
-  var vmProgs=[...new Set(vmData.map(function(r){return r.programa;}))].sort();
-  var vmEl=g('infVmContent');
-  if(!vmEl)return;
-
-  if(!vmData.length){
-    vmEl.innerHTML='<div style="color:#ccc;font-size:.8rem">Sin datos de VM Academy.</div>';
-    return;
-  }
-
-  var html='';
-  vmProgs.forEach(function(prog){
-    var pData=vmData.filter(function(r){return r.programa===prog;});
-    var gPct=calcPct(pData);
-    html+='<div style="margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid #f5f5f5">';
-    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
-    html+='<div style="font-size:.78rem;font-weight:700;color:#333">'+esc(prog)+'</div>';
-    html+='<div style="font-size:1rem;font-weight:800;color:#1a1a1a">'+gPct.pct+'%</div>';
-    html+='</div>';
-    html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">';
-    COUNTRIES.forEach(function(c){
-      var s=pData.filter(function(r){return r.pais===c;});
-      if(!s.length)return;
-      var k=calcPct(s);
-      var col=k.pct>=70?'#22a06b':k.pct>=50?'#F5A874':'#E97132';
-      html+='<div style="padding:10px 12px;background:#f8f9fa;border-radius:8px">';
-      html+='<div style="font-size:.62rem;font-weight:700;text-transform:uppercase;color:#bbb;margin-bottom:3px">'+(FLAGS[c]||'')+' '+c+'</div>';
-      html+='<div style="font-size:1.3rem;font-weight:900;color:#1a1a1a">'+k.pct+'%</div>';
-      html+='<div style="height:3px;background:#eee;border-radius:2px;margin:5px 0 3px;overflow:hidden"><div style="width:'+k.pct+'%;height:100%;background:'+col+';border-radius:2px"></div></div>';
-      html+='<div style="font-size:.65rem;color:#bbb">'+k.comp+' de '+k.total+'</div>';
-      html+='</div>';
-    });
-    html+='</div></div>';
-  });
-  vmEl.innerHTML=html;
-}
-
-function renderInforme(){
-  // Retry if data not loaded yet
-  if(!P.raw.length&&!C.raw.length){
-    if(g('infNoData'))g('infNoData').style.display='block';
-    if(g('infMain'))g('infMain').style.display='none';
-    setTimeout(function(){if(P.raw.length||C.raw.length)renderInforme();},1000);
-    return;
-  }
-  if(g('infNoData'))g('infNoData').style.display='none';
-  if(g('infMain'))g('infMain').style.display='block';
-
-  buildMonthOptions();
-  showNewsEditBtn();
-  renderNewsTicker();
-
-  var d=getInformeData();
-  var COUNTRIES=['ARGENTINA','CHILE','MEXICO','PERU'];
-
-  // Period pill
-  var sel=g('infMonthSel');
-  var periodLabel=d.period==='all'?'Acumulado 2026':(sel&&sel.selectedIndex>=0?sel.options[sel.selectedIndex].text:'');
-  if(g('infPeriodPill'))g('infPeriodPill').textContent=periodLabel;
-
-  // Ingresos del período (from Jan 2026)
-  var ingresos=0;
-  if(d.period!=='all'){
-    var parts=d.period.split('-');
-    var fy=parseInt(parts[0]),fm=parseInt(parts[1])-1;
-    var legIng=new Set();
-    P.raw.forEach(function(r){
-      if(r.fechaContrDate&&r.fechaContrDate.getFullYear()===fy&&r.fechaContrDate.getMonth()===fm)
-        legIng.add(r.legajo);
-    });
-    ingresos=legIng.size;
-  }
-  var ingEl=g('infIngresosPill');
-  if(ingEl){ingEl.style.display=ingresos>0?'':'none';if(ingresos>0)ingEl.textContent=ingresos+' ingresos en el período';}
-
-  // Evolutivo
-  renderEvolutivo();
-
-  // ── ONBOARDING ─────────────────────────────────────────────
-  var onbData=d.prog.filter(function(r){return r.programa&&r.programa.toUpperCase().indexOf('ONBOARDING')>=0;});
-  var onbG=calcPct(onbData);
-  var onbComp=new Set(onbData.filter(function(r){return r.estado==='Completado';}).map(function(r){return r.legajo;})).size;
-  var onbTotal=new Set(onbData.map(function(r){return r.legajo;})).size;
-  if(g('infOnbPct'))g('infOnbPct').innerHTML=onbG.pct+'<span>% global</span>';
-  var onbStats=mkStat(onbG.pct+'%','Completitud')+mkStat(onbComp,'Completaron')+mkStat(onbTotal,'Nómina total');
-  if(ingresos>0)onbStats+=mkStat(ingresos,'Ingresos período');
-  if(g('infOnbStats'))g('infOnbStats').innerHTML=onbStats;
-  var onbC='';COUNTRIES.forEach(function(c){var s=onbData.filter(function(r){return r.pais===c;});if(s.length){var k=calcPct(s);onbC+=mkCountry(c,k.pct,k.comp,k.total);}});
-  if(g('infOnbCountries'))g('infOnbCountries').innerHTML=onbC||'<div style="color:#ccc;font-size:.8rem">Sin datos de Onboarding</div>';
-
-  // ── CX EXPERT ──────────────────────────────────────────────
-  var cxData=d.prog.filter(function(r){return r.programa&&r.programa.toUpperCase().indexOf('CX')>=0&&r.programa.toUpperCase().indexOf('EXPERT')>=0;});
-  var cxG=calcPct(cxData);
-  var cxComp=new Set(cxData.filter(function(r){return r.estado==='Completado';}).map(function(r){return r.legajo;})).size;
-  var cxTotal=new Set(cxData.map(function(r){return r.legajo;})).size;
-  if(g('infCxPct'))g('infCxPct').innerHTML=cxG.pct+'<span>% global</span>';
-  if(g('infCxStats'))g('infCxStats').innerHTML=mkStat(cxG.pct+'%','Completitud')+mkStat(cxComp,'Completaron')+mkStat(cxTotal,'Nómina total');
-  var cxC='';COUNTRIES.forEach(function(c){var s=cxData.filter(function(r){return r.pais===c;});if(s.length){var k=calcPct(s);cxC+=mkCountry(c,k.pct,k.comp,k.total);}});
-  if(g('infCxCountries'))g('infCxCountries').innerHTML=cxC||'<div style="color:#ccc;font-size:.8rem">Sin datos de CX Expert</div>';
-
-  // ── CX EXPERT EVOLUTIVO ────────────────────────────────────
-  renderCxEvolutivo();
-
-  // ── RECORRIDO ──────────────────────────────────────────────
-  renderRecorrido(d);
-
-  // ── VM ACADEMY ─────────────────────────────────────────────
-  renderVmAcademy(d);
-}
-
 
 document.addEventListener('DOMContentLoaded',function(){
   // Cache version check — clear if outdated format
@@ -2620,7 +2432,448 @@ document.addEventListener('DOMContentLoaded',function(){
   g('cBtnMore').addEventListener('click',function(){var sf=g('cSecFilters');sf.classList.toggle('show');g('cMoreIcon').innerHTML=sf.classList.contains('show')?'&#9650;':'&#9660;';});
   g('cTSearch').addEventListener('input',cTable);
   g('cBtnExp').addEventListener('click',cExport);
+  // Gantt tab wire
+  var gBtn=g('tabBtnGantt');
+  if(gBtn)gBtn.addEventListener('click',showTabGantt);
+
+  // Restore session on page refresh (F5) — keeps the user logged in instead of returning to login
+  try{
+    var savedUser=localStorage.getItem('xtc_session_user');
+    if(savedUser && LOGINS[savedUser]){
+      CU=savedUser;
+      CF=LOGINS[savedUser].cf;
+      enterDash();
+    }
+  }catch(e){}
 });
+
+// ============================================================
+// GANTT — seguimiento interno (solo global)
+// ============================================================
+var GANTT_KEY = 'xtc_gantt_v2';
+var GANTT_TASKS = [];
+var GANTT_VIEW = 'week'; // 'week' | 'month' | 'quarter'
+var GANTT_OFFSET = 0;    // weeks/months offset from today
+var GANTT_EDIT_ID = null;
+
+var GANTT_STATUS_META = {
+  pending:    {label:'Pendiente',   cls:'gs-pending',    dot:'#F5C842'},
+  inprogress: {label:'En progreso', cls:'gs-inprogress', dot:'#3B82F6'},
+  review:     {label:'En revisión', cls:'gs-review',     dot:'#AE90C3'},
+  done:       {label:'Completado',  cls:'gs-done',       dot:'#22a06b'}
+};
+var GANTT_PRIO_META = {
+  high:{label:'🔴 Alta', dot:'#EF4444'},
+  mid: {label:'🟡 Media',dot:'#F5A623'},
+  low: {label:'🟢 Baja', dot:'#22a06b'}
+};
+
+// Show Gantt tab only for global user
+function ganttCheckVisibility(){
+  var btn=g('tabBtnGantt');
+  var allowed = !!(LOGINS[CU] && LOGINS[CU].training);
+  if(btn) btn.style.display = allowed ? 'inline-block' : 'none';
+}
+
+function ganttLoad(){
+  try{
+    var raw=localStorage.getItem(GANTT_KEY);
+    if(raw) GANTT_TASKS=JSON.parse(raw)||[];
+    else GANTT_TASKS=[];
+    // Add demo tasks on first run
+    if(!GANTT_TASKS.length){
+      var today=new Date();
+      var fmt=function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+      var add=function(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;};
+GANTT_TASKS = [
+  {id:'t1',name:'Curso Scrap Fallado - En revisión',assignee:'XTC (CM)',flags:['🌎'],status:'review',prio:'mid',category:'Cursos',start:'2023-07-01',end:'',progress:0,color:'bar-purple',notes:''},
+  {id:'t2',name:'Open Academy 1 2 y 3 Validación',assignee:'XTC (CM)',flags:['🌎'],status:'review',prio:'high',category:'Programas',start:'2023-07-01',end:'',progress:0,color:'bar-purple',notes:''},
+  {id:'t3',name:'VM Academy | Visión estratégica',assignee:'XTC (CM)',flags:['🌎'],status:'inprogress',prio:'mid',category:'Programas',start:'2023-07-01',end:'',progress:0,color:'bar-blue',notes:''},
+  {id:'t4',name:'Curso Selección y perfiles | En validación',assignee:'XTC (CM)',flags:['🌎'],status:'review',prio:'mid',category:'Cursos',start:'2023-07-01',end:'',progress:0,color:'bar-purple',notes:''},  
+  {id:'t5',name:'Curso Caja CL_PE_MX | En diseño',assignee:'XTC (CM)',flags:['🇨🇱','🇵🇪','🇲🇽'],status:'inprogress',prio:'mid',category:'Cursos',start:'2023-07-01',end:'',progress:0,color:'bar-orange',notes:''},
+  {id:'t6',name:'Sem Beginners (Gestión personas...)',assignee:'XTC (CM)',flags:['🌎'],status:'pending',prio:'low',category:'Programas',start:'2023-07-01',end:'',progress:0,color:'bar-gray',notes:''},
+  {id:'t7',name:'Season Book ISA | En validación',assignee:'XTC (CM)',flags:['🇦🇷'],status:'review',prio:'high',category:'Cursos',start:'2023-07-01',end:'',progress:0,color:'bar-purple',notes:''},
+  {id:'t8',name:'Curso Todos somos CX | En diseño',assignee:'XTC (CM)',flags:['🌎'],status:'inprogress',prio:'high',category:'Cursos',start:'2023-07-01',end:'',progress:0,color:'bar-orange',notes:''},
+  {id:'t9',name:'Campaña CX WEEK',assignee:'XTC (CM)',flags:['🌎'],status:'inprogress',prio:'high',category:'Programas',start:'2023-07-01',end:'',progress:0,color:'bar-blue',notes:''},
+  {id:'t10',name:'Certificación Scoring IVM',assignee:'XTC (CM)',flags:['🇦🇷'],status:'pending',prio:'high',category:'Cursos',start:'2023-07-01',end:'',progress:0,color:'bar-gray',notes:''}
+];
+ganttSave();
+    }
+  }catch(e){GANTT_TASKS=[];}
+}
+
+function ganttSave(){
+  try{localStorage.setItem(GANTT_KEY,JSON.stringify(GANTT_TASKS));}catch(e){}
+}
+
+// ── Date helpers ────────────────────────────────────────────
+function ganttParseDate(s){
+  if(!s)return null;
+  var parts=s.split('-');
+  if(parts.length===3)return new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  return null;
+}
+function ganttFmtDate(d){
+  if(!d)return '';
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function ganttFmtDisplay(d){
+  if(!d)return '';
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+}
+function ganttAddDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function ganttStartOfWeek(d){var x=new Date(d);x.setDate(x.getDate()-x.getDay()+1);return x;} // Monday
+
+// ── Build date columns ──────────────────────────────────────
+function ganttBuildDays(){
+  var today=new Date();today.setHours(0,0,0,0);
+  var cols=[],start,count;
+  if(GANTT_VIEW==='week'){
+    start=ganttStartOfWeek(today);
+    start=ganttAddDays(start,GANTT_OFFSET*7);
+    count=14; // 2 weeks
+  }else if(GANTT_VIEW==='month'){
+    start=new Date(today.getFullYear(),today.getMonth()+GANTT_OFFSET,1);
+    count=new Date(today.getFullYear(),today.getMonth()+GANTT_OFFSET+1,0).getDate();
+  }else{
+    // quarter = 13 weeks
+    start=ganttStartOfWeek(today);
+    start=ganttAddDays(start,GANTT_OFFSET*91);
+    count=91;
+  }
+  for(var i=0;i<count;i++){
+    var d=new Date(start);d.setDate(d.getDate()+i);
+    cols.push(d);
+  }
+  return{cols:cols,start:cols[0],end:cols[cols.length-1]};
+}
+
+// ── Period label ────────────────────────────────────────────
+function ganttPeriodLabel(days){
+  if(!days.cols.length)return'';
+  var s=days.cols[0],e=days.cols[days.cols.length-1];
+  var MONTHS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  if(GANTT_VIEW==='month') return MONTHS[s.getMonth()]+' '+s.getFullYear();
+  return ganttFmtDisplay(s)+' – '+ganttFmtDisplay(e)+' '+e.getFullYear();
+}
+
+// ── Main render ─────────────────────────────────────────────
+function ganttRender(){
+  if(!LOGINS[CU].training)return;
+  if(!GANTT_TASKS.length)ganttLoad();
+
+  var today=new Date();today.setHours(0,0,0,0);
+  var days=ganttBuildDays();
+  var lbl=g('ganttPeriodLabel');if(lbl)lbl.textContent=ganttPeriodLabel(days);
+
+  // Apply filters
+  var fPais=g('ganttFPais')?g('ganttFPais').value:'';
+  var fStatus=g('ganttFStatus')?g('ganttFStatus').value:'';
+  var fPrio=g('ganttFPrio')?g('ganttFPrio').value:'';
+  var fSearch=(g('ganttSearch')?g('ganttSearch').value:'').trim().toLowerCase();
+
+  var filtered=GANTT_TASKS.filter(function(t){
+    if(CU!=='global' && (!t.flags || t.flags.indexOf(LOGINS[CU].pais)<0)) return false;
+    if(fPais&&(!t.flags||t.flags.indexOf(fPais)<0))return false;
+    if(fStatus&&t.status!==fStatus)return false;
+    if(fPrio&&t.prio!==fPrio)return false;
+    if(fSearch&&(t.name+t.assignee).toLowerCase().indexOf(fSearch)<0)return false;
+    return true;
+  });
+
+  // Stats
+  ganttRenderStats(CU==='global'?GANTT_TASKS:filtered);
+
+  // Build table
+  var wrap=g('ganttTableWrap');
+  if(!wrap)return;
+
+  if(!filtered.length){
+    wrap.innerHTML='<div class="gantt-empty"><div class="ge-icon">📋</div><p>No hay tareas que coincidan con los filtros.<br>Hacé clic en <strong>"+ Nueva tarea"</strong> para agregar la primera.</p></div>';
+    return;
+  }
+
+  // Compute date range
+  var rangeStart=days.start;
+  var rangeEnd=days.end;
+
+  // For quarter view with many days, group by weeks in header
+  var showWeekGroups=(GANTT_VIEW==='quarter');
+
+  // Build header row
+  var hdrHtml='<tr>';
+  hdrHtml+='<th class="gt-task">Tarea / Responsable</th>';
+  hdrHtml+='<th style="min-width:80px;white-space:nowrap">Estado</th>';
+  hdrHtml+='<th style="min-width:90px;white-space:nowrap">Prioridad</th>';
+  hdrHtml+='<th style="min-width:90px;white-space:nowrap">Deadline</th>';
+
+  days.cols.forEach(function(d,i){
+    var isToday=(d.getTime()===today.getTime());
+    var isWknd=(d.getDay()===0||d.getDay()===6);
+    var cls='gt-day-hdr'+(isToday?' today-hdr':'')+(isWknd?' weekend':'');
+    var lbl2=(GANTT_VIEW==='quarter'&&i%7!==0)?'':ganttFmtDisplay(d);
+    if(GANTT_VIEW==='quarter'&&i%7!==0) lbl2='';
+    hdrHtml+='<th class="'+cls+'">'+lbl2+'</th>';
+  });
+  hdrHtml+='</tr>';
+
+  // Build task rows
+  var rowsHtml='';
+  filtered.forEach(function(t){
+    var tStart=ganttParseDate(t.start);
+    var tEnd=ganttParseDate(t.end);
+    var sm=GANTT_STATUS_META[t.status]||GANTT_STATUS_META.pending;
+    var pm=GANTT_PRIO_META[t.prio]||GANTT_PRIO_META.mid;
+    var isOverdue=(tEnd&&tEnd<today&&t.status!=='done');
+    var flagsHtml=(t.flags||[]).map(function(f){return '<span class="gantt-flag">'+f+'</span>';}).join('');
+    var deadlineStr=tEnd?ganttFmtDisplay(tEnd)+'/'+tEnd.getFullYear():'—';
+    if(isOverdue) deadlineStr='<span style="color:#EF4444;font-weight:700">⚠ '+deadlineStr+'</span>';
+
+    rowsHtml+='<tr>';
+    // Task cell
+    rowsHtml+='<td class="gt-task-cell" style="cursor:pointer" onclick="ganttOpenModal(\''+t.id+'\')">';
+    rowsHtml+='<div class="gantt-task-name" title="'+esc(t.name)+'">'+esc(t.name.length>38?t.name.substring(0,37)+'…':t.name)+'</div>';
+    rowsHtml+='<div class="gantt-task-meta">';
+    rowsHtml+=flagsHtml;
+    if(t.assignee)rowsHtml+='<span class="gantt-assignee">'+esc(t.assignee)+'</span>';
+    if(t.category)rowsHtml+='<span style="color:#ccc">'+esc(t.category)+'</span>';
+    rowsHtml+='</div></td>';
+    // Status
+    rowsHtml+='<td style="padding:6px 8px"><span class="gantt-status '+sm.cls+'">'+sm.label+'</span></td>';
+    // Prio
+    rowsHtml+='<td style="padding:6px 8px;font-size:.75rem;font-weight:700;color:'+pm.dot+'">'+pm.label+'</td>';
+    // Deadline
+    rowsHtml+='<td style="padding:6px 8px;font-size:.74rem;white-space:nowrap">'+deadlineStr+'</td>';
+
+    // Bar cells
+    days.cols.forEach(function(d){
+      var dTime=d.getTime();
+      var isToday2=(dTime===today.getTime());
+      var isWknd2=(d.getDay()===0||d.getDay()===6);
+      var bg=isWknd2?'background:#fafafa':'';
+      var todayLine=isToday2?'<div class="gt-today-line"></div>':'';
+      rowsHtml+='<td class="gt-bar-cell" style="'+bg+'">';
+      rowsHtml+=todayLine;
+      if(tStart&&tEnd){
+        var tS=tStart.getTime(),tE=tEnd.getTime();
+        var rangeMs=(rangeEnd.getTime()-rangeStart.getTime())||1;
+        var dayMs=86400000;
+        var colMs=days.cols.length>0?(rangeMs/(days.cols.length-1||1)):dayMs;
+
+        // Is this cell inside the task range?
+        if(dTime>=tS&&dTime<=tE){
+          var isFirst=(dTime===tS);
+          var isLast=(dTime===tE);
+          var barColor=t.color||'bar-green';
+          // Calculate bar start offset within cell
+          var leftPct=isFirst?0:-100; // extend full cell unless first day
+          // Simple approach: render a div that spans the cell, we'll use CSS position
+          var showLabel=(isFirst&&(tE-tS)<days.cols.length*dayMs*0.5);
+          var barH='<div class="gt-bar-fill '+barColor+'" style="left:0;right:'+(isLast?'0':'-3px')+';'+(isFirst?'left:2px':'left:-3px')+'" onclick="ganttOpenModal(\''+t.id+'\')" title="'+esc(t.name)+'">';
+          if(isFirst&&t.name.length>0){
+            barH+='<span>'+esc(t.name.length>20?t.name.substring(0,18)+'…':t.name)+'</span>';
+          }
+          barH+='</div>';
+          rowsHtml+=barH;
+        }
+      }
+      rowsHtml+='</td>';
+    });
+    rowsHtml+='</tr>';
+  });
+
+  wrap.innerHTML='<table class="gantt-table"><thead>'+hdrHtml+'</thead><tbody>'+rowsHtml+'</tbody></table>';
+}
+
+function ganttRenderStats(tasks){
+  var el=g('ganttStats');if(!el)return;
+  var total=tasks.length;
+  var counts={done:0,inprogress:0,pending:0,blocked:0,review:0};
+  tasks.forEach(function(t){if(counts[t.status]!==undefined)counts[t.status]++;});
+  var today=new Date();today.setHours(0,0,0,0);
+  var overdue=tasks.filter(function(t){var e=ganttParseDate(t.end);return e&&e<today&&t.status!=='done';}).length;
+
+  var pills=[
+    {label:'Total',val:total,dot:'#9CA3AF'},
+    {label:'En progreso',val:counts.inprogress,dot:'#3B82F6'},
+    {label:'Pendientes',val:counts.pending,dot:'#F5C842'},
+    {label:'En revisión',val:counts.review,dot:'#AE90C3'},
+    {label:'Completados',val:counts.done,dot:'#22a06b'},
+    {label:'Bloqueados',val:counts.blocked,dot:'#EF4444'},
+    {label:'Vencidas',val:overdue,dot:'#EF4444'}
+  ];
+  el.innerHTML=pills.map(function(p){
+    return '<div class="gantt-stat-pill"><span class="gantt-stat-dot" style="background:'+p.dot+'"></span>'+p.val+' '+p.label+'</div>';
+  }).join('');
+}
+
+// ── Navigation ──────────────────────────────────────────────
+function ganttNav(dir){GANTT_OFFSET+=dir;ganttRender();}
+function ganttGoToday(){GANTT_OFFSET=0;ganttRender();}
+function ganttSetView(v){
+  GANTT_VIEW=v;GANTT_OFFSET=0;
+  ['ganttVWeek','ganttVMonth','ganttVQuarter'].forEach(function(id){
+    var el=g(id);if(el)el.className='gantt-view-btn';
+  });
+  var map={week:'ganttVWeek',month:'ganttVMonth',quarter:'ganttVQuarter'};
+  var active=g(map[v]);if(active)active.className='gantt-view-btn active';
+  ganttRender();
+}
+
+// ── Modal ───────────────────────────────────────────────────
+function ganttOpenModal(taskId){
+  GANTT_EDIT_ID=taskId||null;
+  var modal=g('ganttModal');if(!modal)return;
+  var title=g('ganttModalTitle');
+  var delBtn=g('ganttBtnDelete');
+
+  // Reset flags
+  document.querySelectorAll('#gfFlagsWrap .gantt-flag-btn').forEach(function(b){b.classList.remove('selected');});
+
+  // Restrict country-flag options for training.xx users to their own country
+  var myPais = LOGINS[CU] && LOGINS[CU].pais;
+  var isTrainingUser = CU!=='global' && !!myPais;
+  document.querySelectorAll('#gfFlagsWrap .gantt-flag-btn').forEach(function(b){
+    b.style.display = isTrainingUser ? (b.getAttribute('data-flag')===myPais?'inline-block':'none') : 'inline-block';
+  });
+
+  if(taskId){
+    var t=GANTT_TASKS.filter(function(x){return x.id===taskId;})[0];
+    if(!t)return;
+    if(title)title.textContent='Editar tarea';
+    if(delBtn)delBtn.style.display='inline-flex';
+    g('gfName').value=t.name||'';
+    g('gfStart').value=t.start||'';
+    g('gfEnd').value=t.end||'';
+    g('gfAssignee').value=t.assignee||'';
+    g('gfStatus').value=t.status||'pending';
+    g('gfPrio').value=t.prio||'mid';
+    g('gfCategory').value=t.category||'Otro';
+    g('gfNotes').value=t.notes||'';
+    g('gfProgress').value=t.progress||0;
+    g('gfColor').value=t.color||'bar-green';
+    // Set flags
+    (t.flags||[]).forEach(function(f){
+      var btn=document.querySelector('#gfFlagsWrap [data-flag="'+f+'"]');
+      if(btn)btn.classList.add('selected');
+    });
+  }else{
+    if(title)title.textContent='Nueva tarea';
+    if(delBtn)delBtn.style.display='none';
+    g('gfName').value='';
+    var todayStr=ganttFmtDate(new Date());
+    g('gfStart').value=todayStr;
+    g('gfEnd').value=todayStr;
+    g('gfAssignee').value='';
+    g('gfStatus').value='pending';
+    g('gfPrio').value='mid';
+    g('gfCategory').value='Otro';
+    g('gfNotes').value='';
+    g('gfProgress').value=0;
+    g('gfColor').value='bar-green';
+    // Auto-assign the training user's own country flag on new tasks
+    if(isTrainingUser){
+      var myBtn=document.querySelector('#gfFlagsWrap [data-flag="'+myPais+'"]');
+      if(myBtn)myBtn.classList.add('selected');
+    }
+  }
+  modal.style.display='flex';
+  setTimeout(function(){var n=g('gfName');if(n)n.focus();},80);
+}
+function ganttCloseModal(){var m=g('ganttModal');if(m)m.style.display='none';}
+function ganttModalBgClick(e){if(e.target===g('ganttModal'))ganttCloseModal();}
+function ganttToggleFlag(btn){btn.classList.toggle('selected');}
+
+function ganttSaveTask(){
+  var name=(g('gfName').value||'').trim();
+  if(!name){alert('El nombre de la tarea es obligatorio.');return;}
+  var start=g('gfStart').value;var end=g('gfEnd').value;
+  if(!start||!end){alert('Las fechas de inicio y deadline son obligatorias.');return;}
+  if(start>end){alert('La fecha de inicio no puede ser posterior al deadline.');return;}
+
+  var myPais = LOGINS[CU] && LOGINS[CU].pais;
+  var isTrainingUser = CU!=='global' && !!myPais;
+
+  // Training users can only ever edit tasks tagged with their own country
+  if(isTrainingUser && GANTT_EDIT_ID){
+    var existing=GANTT_TASKS.filter(function(x){return x.id===GANTT_EDIT_ID;})[0];
+    if(existing && (!existing.flags || existing.flags.indexOf(myPais)<0)){
+      alert('No tenés permiso para editar esta tarea.');
+      return;
+    }
+  }
+
+  var flags=[];
+  document.querySelectorAll('#gfFlagsWrap .gantt-flag-btn.selected').forEach(function(b){flags.push(b.getAttribute('data-flag'));});
+  // Training users are always scoped to their own country, regardless of the UI state
+  if(isTrainingUser) flags=[myPais];
+
+  var task={
+    id:GANTT_EDIT_ID||('t'+Date.now()),
+    name:name,start:start,end:end,
+    assignee:g('gfAssignee').value.trim(),
+    status:g('gfStatus').value,
+    prio:g('gfPrio').value,
+    category:g('gfCategory').value,
+    notes:g('gfNotes').value.trim(),
+    progress:Math.min(100,Math.max(0,parseInt(g('gfProgress').value)||0)),
+    color:g('gfColor').value,
+    flags:flags
+  };
+
+  if(GANTT_EDIT_ID){
+    var idx=-1;for(var ii=0;ii<GANTT_TASKS.length;ii++){if(GANTT_TASKS[ii].id===GANTT_EDIT_ID){idx=ii;break;}}
+    if(idx>=0)GANTT_TASKS[idx]=task;
+    else GANTT_TASKS.push(task);
+  }else{
+    GANTT_TASKS.push(task);
+  }
+  ganttSave();
+  ganttCloseModal();
+  ganttRender();
+}
+
+function ganttDeleteTask(){
+  if(!GANTT_EDIT_ID)return;
+  var myPais = LOGINS[CU] && LOGINS[CU].pais;
+  var isTrainingUser = CU!=='global' && !!myPais;
+  if(isTrainingUser){
+    var existing=GANTT_TASKS.filter(function(x){return x.id===GANTT_EDIT_ID;})[0];
+    if(existing && (!existing.flags || existing.flags.indexOf(myPais)<0)){
+      alert('No tenés permiso para eliminar esta tarea.');
+      return;
+    }
+  }
+  if(!confirm('¿Eliminar esta tarea? Esta acción no se puede deshacer.'))return;
+  GANTT_TASKS=GANTT_TASKS.filter(function(t){return t.id!==GANTT_EDIT_ID;});
+  ganttSave();
+  ganttCloseModal();
+  ganttRender();
+}
+
+// ── Export CSV ──────────────────────────────────────────────
+function ganttExportCSV(){
+  var hdr=['ID','Tarea','Responsable','Países','Estado','Prioridad','Categoría','Inicio','Deadline','Progreso (%)','Notas'];
+  var nl='\n';
+  var csv=hdr.map(function(h){return '"'+h+'"';}).join(',')+nl;
+  GANTT_TASKS.forEach(function(t){
+    csv+=[t.id,t.name,t.assignee||'',(t.flags||[]).join(' '),
+      (GANTT_STATUS_META[t.status]||{}).label||t.status,
+      (GANTT_PRIO_META[t.prio]||{}).label||t.prio,
+      t.category||'',t.start,t.end,t.progress,t.notes||'']
+      .map(function(c){return '"'+String(c||'').replace(/"/g,'""')+'"';}).join(',')+nl;
+  });
+  downloadCSV(csv,'seguimiento_gantt.csv');
+}
+
+// ── Initialize Gantt on enterDash ──────────────────────────
+// Hook into existing enterDash: show tab and load data
+var _origEnterDash=enterDash;
+enterDash=function(){
+  _origEnterDash();
+  ganttLoad();
+  ganttCheckVisibility();
+};
 </script>
 </body>
 </html>
