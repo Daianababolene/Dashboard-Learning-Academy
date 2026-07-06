@@ -978,6 +978,16 @@ function clearAllStoredData(){
 }
 
 // ── Storage info for modal ──────────────────────────────────
+function metaUpdateDateStr(meta){
+  if(meta && meta.updateDate) return meta.updateDate;
+  // Backward compatibility: derive DD/MM from older cached meta that only has loadTime (es-AR: D/M/YYYY, HH:MM:SS)
+  if(meta && meta.loadTime){
+    var datePart=String(meta.loadTime).split(',')[0].trim();
+    var parts=datePart.split('/');
+    if(parts.length===3) return parts[0].padStart(2,'0')+'/'+parts[1].padStart(2,'0');
+  }
+  return '-';
+}
 function applyData(isProg, rows, meta){
   var filtered = CF ? rows.filter(function(r){return CF.indexOf(r.pais)>=0;}) : rows;
   if(isProg){
@@ -989,6 +999,8 @@ function applyData(isProg, rows, meta){
     if(rcEl) rcEl.textContent = filtered.length.toLocaleString();
     var ltEl = g('dpLoadTime');
     if(ltEl) ltEl.textContent = meta.loadTime||'';
+    var upEl = g('dpUpdateTime');
+    if(upEl) upEl.textContent = metaUpdateDateStr(meta);
     var dib = g('dibProg'); if(dib) dib.style.display='flex';
     // Show correct info based on role
     var isGlobal=(CU==='global');
@@ -1003,6 +1015,8 @@ function applyData(isProg, rows, meta){
     if(rcEl2) rcEl2.textContent = filtered.length.toLocaleString();
     var ltEl2 = g('dcLoadTime');
     if(ltEl2) ltEl2.textContent = meta.loadTime||'';
+    var upEl2 = g('dcUpdateTime');
+    if(upEl2) upEl2.textContent = metaUpdateDateStr(meta);
     var dib2 = g('dibCurs'); if(dib2) dib2.style.display='flex';
     var isGlobal2=(CU==='global');
     var gEl2=g('dibCursGlobal'); if(gEl2) gEl2.style.display=isGlobal2?'':'none';
@@ -1441,8 +1455,10 @@ function readExcel(file,isProg,cb){
         cb();return;
       }
       var filtered=CF?mapped.filter(function(r){return CF.indexOf(r.pais)>=0;}):mapped;
-      var loadTime = new Date().toLocaleString('es-AR');
-      var meta = { fileName: file.name, loadTime: loadTime, rowCount: mapped.length };
+      var now = new Date();
+      var loadTime = now.toLocaleString('es-AR');
+      var updateDate = String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0');
+      var meta = { fileName: file.name, loadTime: loadTime, updateDate: updateDate, rowCount: mapped.length };
       // Apply to local state immediately
       applyData(isProg, mapped, meta);
       // Call cb() immediately — don't wait for cloud sync
