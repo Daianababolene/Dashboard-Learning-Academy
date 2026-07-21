@@ -409,7 +409,7 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
   <div class="tab-content active" id="tabProg">
     <div class="data-info-bar dib-prog" id="dibProg" style="display:none">
       <span id="dibProgGlobal">Archivo: <span id="dpFileName">-</span> &nbsp;|&nbsp; Registros: <span id="dpRowCount">-</span> &nbsp;|&nbsp; Cargado: <span id="dpLoadTime">-</span></span>
-      <span id="dibProgCountry" style="display:none">Reportes actualizados al <span id="dpUpdateTime">-</span></span>
+      <span id="dibProgCountry" style="display:none">Información actualizada al <span id="dpUpdateTime">-</span></span>
     </div>
     <div id="pNoData" class="no-data-state" style="display:none"><div class="nd-icon">&#128218;</div><p>No hay datos de Programas.<br>Inicia sesion como <strong>global</strong> y sube el Excel.</p></div>
     <div id="pMain" style="display:none">
@@ -471,7 +471,7 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
   <div class="tab-content" id="tabCurs">
     <div class="data-info-bar dib-curs" id="dibCurs" style="display:none">
       <span id="dibCursGlobal">Archivo: <span id="dcFileName">-</span> &nbsp;|&nbsp; Registros: <span id="dcRowCount">-</span> &nbsp;|&nbsp; Cargado: <span id="dcLoadTime">-</span></span>
-      <span id="dibCursCountry" style="display:none">Reportes actualizados al <span id="dcUpdateTime">-</span></span>
+      <span id="dibCursCountry" style="display:none">Información actualizada al <span id="dcUpdateTime">-</span></span>
     </div>
     <div id="cNoData" class="no-data-state" style="display:none"><div class="nd-icon">&#128214;</div><p>No hay datos de Cursos.<br>Inicia sesion como <strong>global</strong> y sube el Excel.</p></div>
     <div id="cMain" style="display:none">
@@ -978,13 +978,37 @@ function clearAllStoredData(){
 }
 
 // ── Storage info for modal ──────────────────────────────────
-function metaUpdateDateStr(meta){
-  if(meta && meta.updateDate) return meta.updateDate;
-  // Backward compatibility: derive DD/MM from older cached meta that only has loadTime (es-AR: D/M/YYYY, HH:MM:SS)
-  if(meta && meta.loadTime){
-    var datePart=String(meta.loadTime).split(',')[0].trim();
+var DIAS_ES=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+var MESES_ES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function fmtFechaLarga(d){
+  var dia=DIAS_ES[d.getDay()];
+  dia=dia.charAt(0).toUpperCase()+dia.slice(1);
+  return dia+' '+d.getDate()+' de '+MESES_ES[d.getMonth()];
+}
+function parseEsARDate(str){
+  try{
+    var datePart=String(str).split(',')[0].trim();
     var parts=datePart.split('/');
-    if(parts.length===3) return parts[0].padStart(2,'0')+'/'+parts[1].padStart(2,'0');
+    if(parts.length!==3) return null;
+    var d=new Date(parseInt(parts[2],10), parseInt(parts[1],10)-1, parseInt(parts[0],10));
+    if(isNaN(d.getTime())) return null;
+    return d;
+  }catch(e){ return null; }
+}
+function metaUpdateDateStr(meta){
+  if(meta && meta.updateDateFull) return meta.updateDateFull;
+  // Backward compatibility: derive full date from older cached meta (loadTime string, es-AR: D/M/YYYY, HH:MM:SS)
+  if(meta && meta.loadTime){
+    var d=parseEsARDate(meta.loadTime);
+    if(d) return fmtFechaLarga(d);
+  }
+  // Even older cached meta: only has short DD/MM (no year) — assume current year
+  if(meta && meta.updateDate){
+    var parts=String(meta.updateDate).split('/');
+    if(parts.length===2){
+      var d2=new Date(new Date().getFullYear(), parseInt(parts[1],10)-1, parseInt(parts[0],10));
+      if(!isNaN(d2.getTime())) return fmtFechaLarga(d2);
+    }
   }
   return '-';
 }
@@ -1458,7 +1482,8 @@ function readExcel(file,isProg,cb){
       var now = new Date();
       var loadTime = now.toLocaleString('es-AR');
       var updateDate = String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0');
-      var meta = { fileName: file.name, loadTime: loadTime, updateDate: updateDate, rowCount: mapped.length };
+      var updateDateFull = fmtFechaLarga(now);
+      var meta = { fileName: file.name, loadTime: loadTime, updateDate: updateDate, updateDateFull: updateDateFull, rowCount: mapped.length };
       // Apply to local state immediately
       applyData(isProg, mapped, meta);
       // Call cb() immediately — don't wait for cloud sync
