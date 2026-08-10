@@ -350,23 +350,29 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
   <div class="loading-text" id="loadingText">Procesando datos...</div>
 </div>
 <div id="uploadModal" class="modal-overlay" style="display:none">
-  <div style="background:#fff;border-radius:16px;padding:28px;width:500px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:640px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
       <h3 style="font-size:1rem;font-weight:700">Gestionar datos</h3>
       <button id="btnCloseModal" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#888;line-height:1">&times;</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#E97132;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Programas</div>
+        <div style="font-size:.7rem;font-weight:700;color:#E97132;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Programas</div>
         <div class="upload-zone" id="uzProg"><div class="upload-zone-icon">&#128202;</div><div class="upload-zone-text">Programas (.xlsx o .csv)</div><div class="upload-zone-sub">Arrastra o haz click</div></div>
         <input type="file" id="fiProg" accept=".xlsx,.xls,.csv" style="display:none">
         <div class="upload-info" id="uiProg"><strong id="uiProgName"></strong><span id="uiProgSize" style="color:#aaa"></span></div>
       </div>
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#AE90C3;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Cursos</div>
+        <div style="font-size:.7rem;font-weight:700;color:#AE90C3;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Cursos</div>
         <div class="upload-zone" id="uzCurs"><div class="upload-zone-icon">&#128202;</div><div class="upload-zone-text">Cursos (.xlsx o .csv)</div><div class="upload-zone-sub">Arrastra o haz click</div></div>
         <input type="file" id="fiCurs" accept=".xlsx,.xls,.csv" style="display:none">
         <div class="upload-info" id="uiCurs"><strong id="uiCursName"></strong><span id="uiCursSize" style="color:#aaa"></span></div>
+      </div>
+      <div>
+        <div style="font-size:.7rem;font-weight:700;color:#22a06b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Talent Match</div>
+        <div class="upload-zone" id="uzTalent"><div class="upload-zone-icon">&#128202;</div><div class="upload-zone-text">Talent Match (.xlsx o .csv)</div><div class="upload-zone-sub">Arrastra o haz click</div></div>
+        <input type="file" id="fiTalent" accept=".xlsx,.xls,.csv" style="display:none">
+        <div class="upload-info" id="uiTalent"><strong id="uiTalentName"></strong><span id="uiTalentSize" style="color:#aaa"></span></div>
       </div>
     </div>
     <div id="modalStorageInfo" style="margin-top:12px;background:#f8f8f8;border-radius:8px;padding:10px 14px;font-size:.76rem;color:#666;line-height:1.7"></div>
@@ -750,7 +756,10 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
       <div id="rmProfile" style="display:none">
         <div style="background:#fff;border:1px solid #eee;border-radius:14px;padding:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
           <div>
-            <div style="font-weight:700;font-size:1rem;color:#333" id="rmPName">-</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="font-weight:700;font-size:1rem;color:#333" id="rmPName">-</span>
+              <span id="rmPTalentBadges" style="display:none;align-items:center;gap:6px"></span>
+            </div>
             <div style="font-size:.78rem;color:#888;margin-top:2px">Legajo <span id="rmPLegajo">-</span> &nbsp;|&nbsp; Unidad de Negocio: <span id="rmPPais">-</span> &nbsp;|&nbsp; Distrito: <span id="rmPDistrito">-</span> &nbsp;|&nbsp; Tienda: <span id="rmPTienda">-</span> &nbsp;|&nbsp; Ingreso: <span id="rmPIngreso">-</span></div>
           </div>
           <button onclick="rmClearPerson()" style="background:#f5f5f5;border:1px solid #e0e0e0;padding:6px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;color:#888">Cambiar persona</button>
@@ -824,7 +833,9 @@ var BASE={orange:'#E97132',purple:'#AE90C3',yellow:'#F5F378'};
 var CF=null,CU=null,PS=50;
 var P_SORT={col:null,dir:0}; // col=field name, dir=0 none,1 asc,-1 desc
 var C_SORT={col:null,dir:0};
-var pendProg=null,pendCurs=null;
+var pendProg=null,pendCurs=null,pendTalent=null;
+var TM={raw:[]};
+var TM_KEY='xtc_talent_v1';
 var EXCLUDE_STAFF=false;  // toggle state for Programas
 var EXCLUDE_STAFF_C=false; // toggle state for Cursos
 
@@ -1073,7 +1084,7 @@ function restoreData(isProg, onDone){
 
 // ── Clear local cache ───────────────────────────────────────
 function clearAllStoredData(){
-  ['xtc_sb_prog','xtc_sb_curs','xtc_prog_v2','xtc_curs_v2'].forEach(function(k){
+  ['xtc_sb_prog','xtc_sb_curs','xtc_prog_v2','xtc_curs_v2','xtc_talent_v1'].forEach(function(k){
     try{localStorage.removeItem(k);}catch(e){}
   });
 }
@@ -1351,6 +1362,36 @@ function mapCursRow(headers,row){
   };
 }
 
+// ── Talent Match: cruce por legajo, mostrado siempre como letra/emoji ──
+function mapTalentRow(headers,row){
+  var map={};for(var i=0;i<headers.length;i++)map[nH(headers[i])]=row[i]!==undefined&&row[i]!==null?String(row[i]):'';
+  return{
+    pais:      gV(map,['Pais','Pa\u00eds']),
+    tienda:    gV(map,['Tienda']),
+    legajo:    gV(map,['ID SF','Id Sf','IDSF','Legajo']),
+    nombre:    gV(map,['Nombre']),
+    cargo:     gV(map,['Cargo']),
+    antiguedad:gV(map,['Antiguedad','Antig\u00fcedad']),
+    potencial: gV(map,['Potencial']),
+    clasif:    gV(map,['Clasif. Calibrada','Clasif Calibrada','Clasificacion Calibrada','Clasificaci\u00f3n Calibrada'])
+  };
+}
+// Devuelve siempre "SI"/"NO"/"-" — nunca la palabra completa del origen
+function tmPotencialLabel(v){
+  var t=String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(t==='si'||t==='s'||t==='yes'||t==='y')return 'SI';
+  if(t==='no'||t==='n')return 'NO';
+  return '-';
+}
+// Devuelve siempre letra (P/N/D) + emoji — nunca "Promotor"/"Neutro"/"Detractor" escrito
+function tmClasifBadge(v){
+  var t=String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(t.indexOf('promotor')>=0)return {letter:'P',emoji:'😀'};
+  if(t.indexOf('neutro')>=0)return {letter:'N',emoji:'😐'};
+  if(t.indexOf('detractor')>=0)return {letter:'D',emoji:'😕'};
+  return {letter:'-',emoji:'—'};
+}
+
 // ============================================================
 // AUTH
 // ============================================================
@@ -1530,9 +1571,9 @@ function loadAccessLog(){
 }
 
 function openModal(){
-  pendProg=null;pendCurs=null;
-  g('uiProg').style.display='none';g('uiCurs').style.display='none';
-  g('fiProg').value='';g('fiCurs').value='';
+  pendProg=null;pendCurs=null;pendTalent=null;
+  g('uiProg').style.display='none';g('uiCurs').style.display='none';g('uiTalent').style.display='none';
+  g('fiProg').value='';g('fiCurs').value='';g('fiTalent').value='';
   g('modalStorageInfo').innerHTML = getStorageInfo();
   var logSection=g('accessLogSection');
   if(logSection){
@@ -1556,9 +1597,22 @@ function setUpFile(file,isProg){
   if(isProg){pendProg=file;g('uiProgName').textContent=file.name;g('uiProgSize').textContent=' - '+sz;g('uiProg').style.display='block';}
   else{pendCurs=file;g('uiCursName').textContent=file.name;g('uiCursSize').textContent=' - '+sz;g('uiCurs').style.display='block';}
 }
+function setupUZTalent(zoneId,inputId){
+  var z=g(zoneId),inp=g(inputId);
+  z.addEventListener('click',function(){inp.click();});
+  z.addEventListener('dragover',function(e){e.preventDefault();z.classList.add('dragover');});
+  z.addEventListener('dragleave',function(){z.classList.remove('dragover');});
+  z.addEventListener('drop',function(e){e.preventDefault();z.classList.remove('dragover');var f=e.dataTransfer.files[0];if(f)setUpTalentFile(f);});
+  inp.addEventListener('change',function(e){if(e.target.files[0])setUpTalentFile(e.target.files[0]);});
+}
+function setUpTalentFile(file){
+  if(!file.name.match(/\.(xlsx|xls|csv)$/i)){alert('Selecciona un archivo Excel (.xlsx o .xls)');return;}
+  var sz=(file.size/1024).toFixed(1)+' KB';
+  pendTalent=file;g('uiTalentName').textContent=file.name;g('uiTalentSize').textContent=' - '+sz;g('uiTalent').style.display='block';
+}
 
 function applyUploads(){
-  if(!pendProg&&!pendCurs){alert('Selecciona al menos un archivo.');return;}
+  if(!pendProg&&!pendCurs&&!pendTalent){alert('Selecciona al menos un archivo.');return;}
   closeModal();
   g('loadingOverlay').style.display='flex';
   g('loadingText').textContent='Procesando archivos...';
@@ -1569,11 +1623,17 @@ function applyUploads(){
 }
 function processQueue(queue,idx){
   if(idx>=queue.length){
+    if(pendTalent){
+      readTalentExcel(pendTalent,function(){
+        g('loadingOverlay').style.display='none';
+        refreshTabProg();refreshTabCurs();
+        if(RM_SELECTED_LEGAJO)rmRenderTimeline(RM_SELECTED_LEGAJO);
+      });
+      return;
+    }
     // Hide loading immediately — don't wait for Supabase sync
     g('loadingOverlay').style.display='none';
     refreshTabProg();refreshTabCurs();
-    // Process talent if pending
-
     return;
   }
   setTimeout(function(){readExcel(queue[idx].file,queue[idx].isProg,function(){processQueue(queue,idx+1);});},50);
@@ -2578,6 +2638,53 @@ function readExcelRaw(file,cb){
   isCSV?reader.readAsText(file,'UTF-8'):reader.readAsArrayBuffer(file);
 }
 
+// ── Talent Match: archivo chico, un solo blob en Supabase Storage (sin chunks) ──
+function readTalentExcel(file,cb){
+  readExcelRaw(file,function(rows){
+    try{
+      if(!rows||rows.length<2){ alert('El archivo '+file.name+' no tiene datos suficientes.'); cb(); return; }
+      var headers=rows[0].map(function(h){return String(h||'').trim();});
+      var mapped=[];
+      for(var i=1;i<rows.length;i++){
+        var cleanRow=rows[i].map(function(v){return String(v===null||v===undefined?'':v).trim();});
+        var r=mapTalentRow(headers,cleanRow);
+        if(r.legajo||r.nombre)mapped.push(r);
+      }
+      if(!mapped.length){ alert('No se detectaron registros validos en '+file.name+'.'); cb(); return; }
+      TM.raw=mapped;
+      try{ localStorage.setItem(TM_KEY,JSON.stringify(mapped)); }catch(e){}
+      cb();
+      tmSave(mapped,function(){});
+    }catch(err){ console.error(err); alert('Error procesando '+file.name+': '+err.message); cb(); }
+  });
+}
+function tmSave(rows,cb){
+  uploadToStorage('talentmatch.json',JSON.stringify({rows:rows}),function(ok){ if(cb)cb(ok); });
+}
+function tmLoad(){
+  try{
+    var raw=localStorage.getItem(TM_KEY);
+    if(raw) TM.raw=JSON.parse(raw)||[];
+  }catch(e){ TM.raw=[]; }
+  var url=SB_URL+'/storage/v1/object/public/dashboard-files/talentmatch.json?t='+Date.now();
+  var xhr=new XMLHttpRequest();
+  xhr.open('GET',url);
+  xhr.timeout=15000;
+  xhr.onload=function(){
+    if(xhr.status===200){
+      try{
+        var data=JSON.parse(xhr.responseText);
+        if(data&&data.rows&&data.rows.length){
+          TM.raw=data.rows;
+          try{ localStorage.setItem(TM_KEY,JSON.stringify(data.rows)); }catch(e){}
+          if(RM_SELECTED_LEGAJO && typeof rmRenderTimeline==='function') rmRenderTimeline(RM_SELECTED_LEGAJO);
+        }
+      }catch(e){}
+    }
+  };
+  xhr.send();
+}
+
 
 // ============================================================
 var INF_NEWS_KEY = 'xtc_news';
@@ -2654,6 +2761,7 @@ document.addEventListener('DOMContentLoaded',function(){
   g('btnLoadModal').addEventListener('click',applyUploads);
   setupUZ('uzProg','fiProg',true);
   setupUZ('uzCurs','fiCurs',false);
+  setupUZTalent('uzTalent','fiTalent');
   // Prog
   g('pBtnClear').addEventListener('click',pClear);
   g('pBtnMore').addEventListener('click',function(){var sf=g('pSecFilters');sf.classList.toggle('show');g('pMoreIcon').innerHTML=sf.classList.contains('show')?'&#9650;':'&#9660;';});
@@ -3303,6 +3411,23 @@ function rmRenderTimeline(legajo){
   g('rmPIngreso').textContent=hireDate?hireDate.toLocaleDateString('es-AR'):'Sin dato';
   g('rmNoHireDateWarn').style.display=hireDate?'none':'block';
 
+  // Talent Match: cruce por legajo (ID SF) — siempre letra/emoji, nunca la palabra completa
+  var talentBadges=g('rmPTalentBadges');
+  var tmRow=TM.raw.filter(function(r){return r.legajo===legajo;})[0];
+  if(tmRow){
+    var pot=tmPotencialLabel(tmRow.potencial);
+    var cla=tmClasifBadge(tmRow.clasif);
+    var potBg = pot==='SI' ? '#EAF3DE' : (pot==='NO' ? '#FCEBEB' : '#eee');
+    var potFg = pot==='SI' ? '#3B6D11' : (pot==='NO' ? '#A32D2D' : '#888');
+    talentBadges.innerHTML =
+      '<span style="background:'+potBg+';color:'+potFg+';padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700">Desarrollo: '+pot+'</span>'+
+      '<span style="background:#f5f5f5;padding:2px 9px;border-radius:20px;font-size:.8rem;font-weight:700;color:#555">'+cla.emoji+' '+cla.letter+'</span>';
+    talentBadges.style.display='flex';
+  }else{
+    talentBadges.innerHTML='';
+    talentBadges.style.display='none';
+  }
+
   var today=rmStartOfDay(new Date());
   var counts={ok:0,tarde:0,atrasado:0,pendiente:0};
   var stagesHtml='';
@@ -3541,11 +3666,12 @@ function rmSaveConfigModal(){
   if(RM_SELECTED_LEGAJO) rmRenderTimeline(RM_SELECTED_LEGAJO);
 }
 
-// ── Initialize Recorrido on enterDash ───────────────────────
+// ── Initialize Recorrido + Talent Match on enterDash ────────
 var _origEnterDash2=enterDash;
 enterDash=function(){
   _origEnterDash2();
   rmLoad();
+  tmLoad();
 };
 </script>
 </body>
