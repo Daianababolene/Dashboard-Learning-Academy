@@ -751,12 +751,25 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
         <div style="background:#fff;border:1px solid #eee;border-radius:14px;padding:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
           <div>
             <div style="font-weight:700;font-size:1rem;color:#333" id="rmPName">-</div>
-            <div style="font-size:.78rem;color:#888;margin-top:2px">Legajo <span id="rmPLegajo">-</span> &nbsp;|&nbsp; <span id="rmPPais">-</span> &nbsp;|&nbsp; Ingreso: <span id="rmPIngreso">-</span></div>
+            <div style="font-size:.78rem;color:#888;margin-top:2px">Legajo <span id="rmPLegajo">-</span> &nbsp;|&nbsp; Unidad de Negocio: <span id="rmPPais">-</span> &nbsp;|&nbsp; Distrito: <span id="rmPDistrito">-</span> &nbsp;|&nbsp; Tienda: <span id="rmPTienda">-</span> &nbsp;|&nbsp; Ingreso: <span id="rmPIngreso">-</span></div>
           </div>
           <button onclick="rmClearPerson()" style="background:#f5f5f5;border:1px solid #e0e0e0;padding:6px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;color:#888">Cambiar persona</button>
         </div>
 
         <div id="rmNoHireDateWarn" style="display:none;background:#FAEEDA;color:#854F0B;border-radius:10px;padding:10px 14px;font-size:.78rem;margin-bottom:16px">⚠ No se encontró fecha de contratación para esta persona — se muestra el avance de cada etapa, pero no se puede calcular si está en plazo o atrasada.</div>
+
+        <div id="rmAlertBanner" style="display:none;border-radius:10px;padding:12px 16px;font-size:.82rem;font-weight:600;margin-bottom:14px"></div>
+
+        <div id="rmOverallBox" style="background:#fff;border:1px solid #eee;border-radius:14px;padding:16px;margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+            <span style="font-size:.78rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px">Avance general del recorrido</span>
+            <span style="font-size:1.3rem;font-weight:800;color:#333" id="rmOverallPct">-</span>
+          </div>
+          <div style="background:#f0f0f0;border-radius:20px;height:10px;overflow:hidden">
+            <div id="rmOverallBar" style="background:#E97132;height:100%;width:0%;border-radius:20px;transition:width .3s"></div>
+          </div>
+          <div id="rmOverallNote" style="font-size:.72rem;color:#aaa;margin-top:6px"></div>
+        </div>
 
         <div id="rmSummary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px"></div>
         <div id="rmTimeline"></div>
@@ -774,7 +787,12 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
       <div style="padding:16px 24px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px">
           <p style="font-size:.78rem;color:#888;margin:0">Para cada etapa, elegí el Programa o Curso real (tal como está cargado) que corresponde. Si el nombre no coincide exacto con tu Excel, seleccionalo de la lista — así el cálculo de cumplimiento va a ser preciso.</p>
-          <button onclick="rmRenderConfigModal()" style="background:#f5f5f5;border:1px solid #e0e0e0;padding:6px 12px;border-radius:8px;font-size:.72rem;cursor:pointer;color:#666;white-space:nowrap">⟳ Actualizar lista</button>
+          <button onclick="rmRenderConfigModal();rmRenderOverallSelect();" style="background:#f5f5f5;border:1px solid #e0e0e0;padding:6px 12px;border-radius:8px;font-size:.72rem;cursor:pointer;color:#666;white-space:nowrap">⟳ Actualizar lista</button>
+        </div>
+        <div id="rmConfigOverallBox" style="border:1px solid #eee;border-radius:10px;padding:10px 12px;margin-bottom:14px;background:#fafafa">
+          <div style="font-weight:700;font-size:.85rem;margin-bottom:6px;color:#333">% de avance general</div>
+          <div style="font-size:.72rem;color:#888;margin-bottom:6px">Elegí el Programa de tu Excel que representa el % de avance general de la persona en el recorrido (ej. "Recorrido de Aprendizaje Tiendas"). Ese porcentaje se muestra arriba de los 4 cuadritos.</div>
+          <select id="rmCfgOverallSelect" onchange="rmCfgSetOverallProgram(this.value)" style="width:100%;padding:6px;border:1px solid #eee;border-radius:6px;font-size:.78rem"></select>
         </div>
         <div id="rmConfigStages" style="max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:14px"></div>
         <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid #eee">
@@ -1236,10 +1254,12 @@ function normSt(v){
   var t=String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   if(!t||t==='-')return 'No completado';
   // English values
-  if(t==='complete'||t==='completed'||t==='complete via rpl')return 'Completado';
+  if(t==='complete'||t==='completed'||t==='complete via rpl'||t==='complete via rap')return 'Completado';
   if(t==='not complete'||t==='not completed'||t==='in progress'||t==='not yet started')return 'No completado';
   // Spanish values
-  if(t==='completado'||t==='completo via rpl'||t==='completar via rpl')return 'Completado';
+  if(t==='completado'||t==='completo via rpl'||t==='completar via rpl'||t==='completo via rap'||t==='completar via rap')return 'Completado';
+  // "Completado vía RAP" (or any variant mentioning RAP as a whole word) counts as Completado
+  if(/\brap\b/.test(t))return 'Completado';
   if(t.indexOf('completado')>=0&&t.indexOf('no ')<0&&t.indexOf('aun')<0)return 'Completado';
   if(t.indexOf('complete')>=0&&t.indexOf('not')<0&&t.indexOf('in progress')<0)return 'Completado';
   return 'No completado';
@@ -1437,7 +1457,10 @@ function refreshTabCurs(){
   }else{g('cNoData').style.display='block';g('cMain').style.display='none';}
   // If the roadmap config modal is open, refresh its dropdowns now that Cursos data arrived
   var rmModal=g('rmConfigModal');
-  if(rmModal && rmModal.style.display==='flex' && typeof rmRenderConfigModal==='function') rmRenderConfigModal();
+  if(rmModal && rmModal.style.display==='flex' && typeof rmRenderConfigModal==='function'){
+    rmRenderConfigModal();
+    if(typeof rmRenderOverallSelect==='function') rmRenderOverallSelect();
+  }
 }
 
 // ============================================================
@@ -3052,8 +3075,10 @@ function ganttExportCSV(){
 // RECORRIDO DE APRENDIZAJE — plan de formación por rol
 // ============================================================
 var ROADMAP_KEY='xtc_roadmap_v2';
+var ROADMAP_OVERALL_KEY='xtc_roadmap_overall_v1';
 var ROADMAP_NAME='CX Expert';
 var ROADMAP_STAGES=[];
+var ROADMAP_OVERALL_PROGRAM='';
 var RM_SELECTED_LEGAJO=null;
 var RM_CONFIG_DRAFT=null;
 
@@ -3073,9 +3098,15 @@ function rmLoad(){
       rmSave();
     }
   }catch(e){ ROADMAP_STAGES=[]; }
+  try{
+    ROADMAP_OVERALL_PROGRAM=localStorage.getItem(ROADMAP_OVERALL_KEY)||'';
+  }catch(e){ ROADMAP_OVERALL_PROGRAM=''; }
 }
 function rmSave(){
   try{ localStorage.setItem(ROADMAP_KEY,JSON.stringify(ROADMAP_STAGES)); }catch(e){}
+}
+function rmSaveOverallProgram(){
+  try{ localStorage.setItem(ROADMAP_OVERALL_KEY,ROADMAP_OVERALL_PROGRAM||''); }catch(e){}
 }
 function rmInit(){
   if(!ROADMAP_STAGES.length) rmLoad();
@@ -3206,11 +3237,16 @@ var RM_BADGE_META={
   ok:{bg:'#EAF3DE',fg:'#3B6D11',label:'En plazo',icon:'✓'},
   tarde:{bg:'#FAEEDA',fg:'#854F0B',label:'Completado tarde',icon:'⏱'},
   atrasado:{bg:'#FCEBEB',fg:'#A32D2D',label:'Atrasado',icon:'⚠'},
+  por_vencer:{bg:'#FFEFD1',fg:'#B45309',label:'Vence pronto',icon:'⏰'},
   pendiente:{bg:'#eee',fg:'#666',label:'Pendiente',icon:'—'},
   no_iniciado:{bg:'#eee',fg:'#666',label:'Pendiente',icon:'—'},
   sin_config:{bg:'#eee',fg:'#999',label:'Sin configurar',icon:'?'}
 };
-var RM_SEV={ok:0,sin_config:1,no_iniciado:2,pendiente:2,tarde:3,atrasado:4};
+var RM_SEV={ok:0,sin_config:1,no_iniciado:2,pendiente:2,por_vencer:3,tarde:4,atrasado:5};
+var RM_WARN_DAYS=10; // avisar N días antes del vencimiento de una etapa
+
+function rmAddDays(d,n){ var r=new Date(d.getTime()); r.setDate(r.getDate()+n); return r; }
+function rmStartOfDay(d){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
 
 function rmRenderTimeline(legajo){
   var progRows=P.raw.filter(function(r){return r.legajo===legajo;});
@@ -3230,17 +3266,44 @@ function rmRenderTimeline(legajo){
   g('rmPName').textContent=person.nombre||'(sin nombre)';
   g('rmPLegajo').textContent=legajo;
   g('rmPPais').textContent=person.pais||'-';
+  g('rmPDistrito').textContent=person.distrito||'-';
+  g('rmPTienda').textContent=person.depto||'-';
   g('rmPIngreso').textContent=hireDate?hireDate.toLocaleDateString('es-AR'):'Sin dato';
   g('rmNoHireDateWarn').style.display=hireDate?'none':'block';
 
+  var today=rmStartOfDay(new Date());
   var counts={ok:0,tarde:0,atrasado:0,pendiente:0};
   var stagesHtml='';
+  var atrasadas=[], porVencer=[];
+
   ROADMAP_STAGES.forEach(function(stage,si){
     var results=stage.items.map(function(item){ return rmItemStatus(item,stage.dias,hireDate,legajo,segmento); });
     var worst='ok';
     results.forEach(function(r){ if(RM_SEV[r.estado]>RM_SEV[worst]) worst=r.estado; });
-    if(worst==='ok')counts.ok++; else if(worst==='tarde')counts.tarde++; else if(worst==='atrasado')counts.atrasado++; else counts.pendiente++;
+
+    var deadline=null, diasRestantes=null;
+    if(hireDate) deadline=rmAddDays(rmStartOfDay(hireDate),stage.dias);
+
+    // If the stage isn't finished, check whether its deadline is within the warning window
+    if((worst==='pendiente'||worst==='no_iniciado') && deadline){
+      diasRestantes=Math.round((deadline-today)/86400000);
+      if(diasRestantes>=0 && diasRestantes<=RM_WARN_DAYS){
+        worst='por_vencer';
+        porVencer.push({stage:stage,index:si,deadline:deadline,diasRestantes:diasRestantes});
+      }
+    }
+    if(worst==='atrasado') atrasadas.push({stage:stage,index:si,deadline:deadline});
+
+    if(worst==='ok')counts.ok++;
+    else if(worst==='tarde')counts.tarde++;
+    else if(worst==='atrasado')counts.atrasado++;
+    else counts.pendiente++; // pendiente, por_vencer, no_iniciado, sin_config all fall in "pendiente" bucket
+
     var bm=RM_BADGE_META[worst];
+    var badgeLabel=bm.label;
+    if(worst==='por_vencer'){
+      badgeLabel = diasRestantes===0 ? 'Vence hoy' : ('Vence en '+diasRestantes+' día'+(diasRestantes===1?'':'s'));
+    }
     var itemsDesc=stage.items.map(function(item){
       if(item.tipo==='curso_por_marca') return 'Visual Merchandising Pro según marca (segmento: '+esc(segmento||'sin dato')+')';
       return esc(item.nombre||'(sin configurar)');
@@ -3253,11 +3316,67 @@ function rmRenderTimeline(legajo){
     stagesHtml+='<div style="flex:1;background:#fafafa;border-radius:10px;padding:10px 14px;margin-bottom:12px">';
     stagesHtml+='<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px">';
     stagesHtml+='<span style="font-weight:500;font-size:.88rem;color:#333">'+esc(stage.plazoLabel)+' · '+esc(stage.label)+'</span>';
-    stagesHtml+='<span style="font-size:.68rem;font-weight:600;color:'+bm.fg+';background:'+bm.bg+';padding:2px 8px;border-radius:20px;white-space:nowrap">'+bm.label+'</span>';
+    stagesHtml+='<span style="font-size:.68rem;font-weight:600;color:'+bm.fg+';background:'+bm.bg+';padding:2px 8px;border-radius:20px;white-space:nowrap">'+esc(badgeLabel)+'</span>';
     stagesHtml+='</div>';
     stagesHtml+='<div style="font-size:.74rem;color:#888;margin-top:3px">'+(itemsDesc||'Sin ítems')+'</div>';
     stagesHtml+='</div></div>';
   });
+
+  // ── Overall % (taken directly from the configured "roadmap" Programa's own progreso field) ──
+  var overallEl=g('rmOverallPct'), overallBar=g('rmOverallBar'), overallNote=g('rmOverallNote');
+  if(ROADMAP_OVERALL_PROGRAM){
+    var overallRow=rmFindBestMatch(P.raw,'programa',ROADMAP_OVERALL_PROGRAM,legajo);
+    if(overallRow){
+      var pct=overallRow.progreso||0;
+      overallEl.textContent=pct+'%';
+      overallBar.style.width=pct+'%';
+      overallBar.style.background = pct>=100 ? '#3B6D11' : (pct>=50 ? '#E97132' : '#A32D2D');
+      overallNote.textContent='Según el programa "'+ROADMAP_OVERALL_PROGRAM+'" en tus datos de Programas.';
+    }else{
+      overallEl.textContent='-';
+      overallBar.style.width='0%';
+      overallNote.textContent='Esta persona no tiene registros del programa "'+ROADMAP_OVERALL_PROGRAM+'".';
+    }
+  }else{
+    overallEl.textContent='-';
+    overallBar.style.width='0%';
+    overallNote.textContent=(CU==='global')?'Configurá qué Programa representa el % general en "⚙ Configurar recorrido".':'Avance general no configurado.';
+  }
+
+  // ── Alert banner: prioritize overdue stages, then upcoming deadlines ──
+  var banner=g('rmAlertBanner');
+  var alertInfo=null;
+  if(atrasadas.length){
+    var a=atrasadas[0];
+    var isLast=a.index===ROADMAP_STAGES.length-1;
+    var dStr=a.deadline?a.deadline.toLocaleDateString('es-AR'):'-';
+    alertInfo={
+      bg:'#FCEBEB', fg:'#A32D2D',
+      text: isLast
+        ? ('⚠ Superó los '+a.stage.plazoLabel+' de antigüedad y no completó su recorrido de aprendizaje. Revisar con Capital Humano — debía completar su formación antes del '+dStr+'.')
+        : ('⚠ La etapa "'+a.stage.label+'" ('+a.stage.plazoLabel+') está atrasada desde el '+dStr+'. Revisar con Capital Humano.')
+    };
+  }else if(porVencer.length){
+    porVencer.sort(function(x,y){return x.diasRestantes-y.diasRestantes;});
+    var w=porVencer[0];
+    var isLast2=w.index===ROADMAP_STAGES.length-1;
+    var dStr2=w.deadline?w.deadline.toLocaleDateString('es-AR'):'-';
+    alertInfo={
+      bg:'#FFEFD1', fg:'#B45309',
+      text: isLast2
+        ? ('⏰ Está llegando a los '+w.stage.plazoLabel+' de antigüedad y no tiene su recorrido completo. Revisar con Capital Humano — debe completar su formación antes del '+dStr2+'.')
+        : ('⏰ La etapa "'+w.stage.label+'" vence el '+dStr2+' ('+w.diasRestantes+' día'+(w.diasRestantes===1?'':'s')+') y aún no fue completada.')
+    };
+  }
+  if(alertInfo){
+    banner.style.display='block';
+    banner.style.background=alertInfo.bg;
+    banner.style.color=alertInfo.fg;
+    banner.textContent=alertInfo.text;
+  }else{
+    banner.style.display='none';
+  }
+
   g('rmSummary').innerHTML=
     '<div style="background:#EAF3DE;border-radius:10px;padding:12px;text-align:center"><div style="font-size:1.3rem;font-weight:700;color:#3B6D11">'+counts.ok+'</div><div style="font-size:.68rem;color:#3B6D11;font-weight:600">EN PLAZO</div></div>'+
     '<div style="background:#FAEEDA;border-radius:10px;padding:12px;text-align:center"><div style="font-size:1.3rem;font-weight:700;color:#854F0B">'+counts.tarde+'</div><div style="font-size:.68rem;color:#854F0B;font-weight:600">TARDE</div></div>'+
@@ -3277,7 +3396,17 @@ function rmDistinctNames(tipo){
 function rmOpenConfigModal(){
   RM_CONFIG_DRAFT=JSON.parse(JSON.stringify(ROADMAP_STAGES));
   rmRenderConfigModal();
+  rmRenderOverallSelect();
   g('rmConfigModal').style.display='flex';
+}
+function rmRenderOverallSelect(){
+  var sel=g('rmCfgOverallSelect');
+  if(!sel) return;
+  sel.innerHTML=rmBuildNombreOptionsRaw('programa',ROADMAP_OVERALL_PROGRAM);
+}
+function rmCfgSetOverallProgram(val){
+  ROADMAP_OVERALL_PROGRAM=val;
+  rmSaveOverallProgram();
 }
 function rmCloseConfigModal(){ g('rmConfigModal').style.display='none'; }
 function rmBuildNombreOptionsRaw(tipo,nombre){
