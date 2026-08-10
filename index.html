@@ -2616,13 +2616,6 @@ function mkPag(divId,state,tp,renderFn){
 // WIRE EVENTS
 // ============================================================
 
-// ============================================================
-var T={raw:[],joined:[],page:1},T_PS=50;
-function mapTalentRow(headers,row){
-  var map={};for(var i=0;i<headers.length;i++)map[headers[i].toString().trim().toLowerCase().replace(/[^a-z0-9]/g,'')]=String(row[i]||'').trim();
-  return{legajo:map['legajo']||map['nrodocumento']||map['id']||'',matchCult:map['matchcultural']||map['match']||'',potencial:map['potencialdedesarrollo']||map['potencial']||''};
-}
-
 // Some files declare a stale/wrong used-range (!ref) — recompute it for real by
 // scanning the actual populated cells, as a fallback when sheet_to_json returns
 // suspiciously few rows despite the sheet clearly having more data.
@@ -2697,8 +2690,11 @@ function readTalentExcel(file,cb){
         if(r.legajo||r.nombre)mapped.push(r);
       }
       if(!mapped.length){
-        console.warn('Talent Match — headers detectados:', headers, '| primera fila de datos:', dataRows[1]);
-        alert('No se detectaron registros validos en '+file.name+'.\nFilas totales leidas: '+rows.length+' (fila de encabezado + '+(dataRows.length-1)+' filas de datos detectadas)\nColumnas detectadas: '+headers.join(', ')+'\nRevisá que el archivo tenga las columnas: País, Tienda, ID SF, Nombre, Cargo, Antigüedad, Potencial, Clasif. Calibrada.');
+        var sampleRaw=dataRows[1]?JSON.stringify(dataRows[1]):'(sin fila 1)';
+        var sampleClean=dataRows[1]?JSON.stringify(dataRows[1].map(function(v){return String(v===null||v===undefined?'':v).trim();})):'-';
+        var sampleMapped=dataRows[1]?JSON.stringify(mapTalentRow(headers,dataRows[1].map(function(v){return String(v===null||v===undefined?'':v).trim();}))):'-';
+        console.warn('Talent Match — headers:', headers, '| fila 1 cruda:', dataRows[1], '| mapeado:', sampleMapped);
+        alert('No se detectaron registros validos en '+file.name+'.\nFilas totales leidas: '+rows.length+' (fila de encabezado + '+(dataRows.length-1)+' filas de datos detectadas)\nColumnas detectadas: '+headers.join(', ')+'\n\n--- DIAGNOSTICO (fila 1 de datos) ---\nCruda: '+sampleRaw+'\nLimpia: '+sampleClean+'\nMapeada: '+sampleMapped);
         cb();return;
       }
       TM.raw=mapped;
