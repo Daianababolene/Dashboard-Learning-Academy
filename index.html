@@ -2623,6 +2623,24 @@ function mapTalentRow(headers,row){
   return{legajo:map['legajo']||map['nrodocumento']||map['id']||'',matchCult:map['matchcultural']||map['match']||'',potencial:map['potencialdedesarrollo']||map['potencial']||''};
 }
 
+// Some files declare a stale/wrong used-range (!ref) — recompute it for real by
+// scanning the actual populated cells, as a fallback when sheet_to_json returns
+// suspiciously few rows despite the sheet clearly having more data.
+function xlsxColLetter(n){var s='';while(n>0){var r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);}return s;}
+function xlsxRealRange(ws){
+  var maxRow=0,maxCol=0;
+  for(var key in ws){
+    if(key.charAt(0)==='!')continue;
+    var m=key.match(/^([A-Z]+)(\d+)$/);
+    if(!m)continue;
+    var col=0;
+    for(var i=0;i<m[1].length;i++){col=col*26+(m[1].charCodeAt(i)-64);}
+    var row=parseInt(m[2],10);
+    if(row>maxRow)maxRow=row;
+    if(col>maxCol)maxCol=col;
+  }
+  return {maxRow:maxRow,maxCol:maxCol};
+}
 function readExcelRaw(file,cb){
   var isCSV=file.name.toLowerCase().endsWith('.csv');
   var reader=new FileReader();
@@ -2630,7 +2648,18 @@ function readExcelRaw(file,cb){
     try{
       var rows;
       if(isCSV){var text=e.target.result;if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);rows=parseCSVtext(text);}
-      else{var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});var ws=wb.Sheets[wb.SheetNames[0]];rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,dateNF:'dd/mm/yyyy'});}
+      else{
+        var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
+        var ws=wb.Sheets[wb.SheetNames[0]];
+        rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,dateNF:'dd/mm/yyyy'});
+        if(rows.length<=1){
+          var real=xlsxRealRange(ws);
+          if(real.maxRow>1){
+            ws['!ref']='A1:'+xlsxColLetter(real.maxCol||1)+real.maxRow;
+            rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,dateNF:'dd/mm/yyyy'});
+          }
+        }
+      }
       cb(rows);
     }catch(err){g('loadingOverlay').style.display='none';alert('Error leyendo archivo: '+err.message);cb([]);}
   };
@@ -2643,14 +2672,35 @@ function readTalentExcel(file,cb){
   readExcelRaw(file,function(rows){
     try{
       if(!rows||rows.length<2){ alert('El archivo '+file.name+' no tiene datos suficientes.'); cb(); return; }
-      var headers=rows[0].map(function(h){return String(h||'').trim();});
+      // Auto-detect the real header row (in case there's a title/metadata row above it,
+      // same logic used for Programas/Cursos) instead of assuming row 0 is always the header.
+      var headerRowIdx=0;
+      for(var ri=0;ri<Math.min(10,rows.length);ri++){
+        var r0=rows[ri]||[];
+        var nonEmpty=r0.filter(function(v){return v!==null&&v!==undefined&&String(v).trim()!=='';}).length;
+        var normd=r0.map(function(v){return nH(v);});
+        var looksLikeHeader = normd.indexOf('idsf')>=0 || (normd.indexOf('nombre')>=0 && normd.indexOf('pais')>=0);
+        if(looksLikeHeader){ headerRowIdx=ri; break; }
+        if(ri===0 && nonEmpty>=3) headerRowIdx=0; // fallback: assume first non-trivial row if nothing better matches
+      }
+      var dataRows=rows.slice(headerRowIdx);
+      var headers=dataRows[0].map(function(h){return String(h||'').trim();});
       var mapped=[];
-      for(var i=1;i<rows.length;i++){
-        var cleanRow=rows[i].map(function(v){return String(v===null||v===undefined?'':v).trim();});
+      var skipped=0;
+      for(var i=1;i<dataRows.length;i++){
+        var cleanRow=dataRows[i].map(function(v){return String(v===null||v===undefined?'':v).trim();});
         var r=mapTalentRow(headers,cleanRow);
+        // Skip only truly broken rows (e.g. "#N/A" from a failed lookup in the source file).
+        // Rows with a valid nombre but no Clasif. Calibrada yet (pending calibration) are kept —
+        // they'll just show the Desarrollo badge without a Perfil badge.
+        if(r.nombre==='#N/A'){ skipped++; continue; }
         if(r.legajo||r.nombre)mapped.push(r);
       }
-      if(!mapped.length){ alert('No se detectaron registros validos en '+file.name+'.'); cb(); return; }
+      if(!mapped.length){
+        console.warn('Talent Match — headers detectados:', headers, '| primera fila de datos:', dataRows[1]);
+        alert('No se detectaron registros validos en '+file.name+'.\nFilas totales leidas: '+rows.length+' (fila de encabezado + '+(dataRows.length-1)+' filas de datos detectadas)\nColumnas detectadas: '+headers.join(', ')+'\nRevisá que el archivo tenga las columnas: País, Tienda, ID SF, Nombre, Cargo, Antigüedad, Potencial, Clasif. Calibrada.');
+        cb();return;
+      }
       TM.raw=mapped;
       try{ localStorage.setItem(TM_KEY,JSON.stringify(mapped)); }catch(e){}
       cb();
@@ -3419,9 +3469,11 @@ function rmRenderTimeline(legajo){
     var cla=tmClasifBadge(tmRow.clasif);
     var potBg = pot==='SI' ? '#EAF3DE' : (pot==='NO' ? '#FCEBEB' : '#eee');
     var potFg = pot==='SI' ? '#3B6D11' : (pot==='NO' ? '#A32D2D' : '#888');
-    talentBadges.innerHTML =
-      '<span style="background:'+potBg+';color:'+potFg+';padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700">Desarrollo: '+pot+'</span>'+
-      '<span style="background:#f5f5f5;padding:2px 9px;border-radius:20px;font-size:.8rem;font-weight:700;color:#555">'+cla.emoji+' '+cla.letter+'</span>';
+    var html='<span style="background:'+potBg+';color:'+potFg+';padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700">Desarrollo: '+pot+'</span>';
+    if(cla.letter!=='-'){
+      html+='<span style="background:#f5f5f5;padding:2px 9px;border-radius:20px;font-size:.8rem;font-weight:700;color:#555">'+cla.emoji+' '+cla.letter+'</span>';
+    }
+    talentBadges.innerHTML=html;
     talentBadges.style.display='flex';
   }else{
     talentBadges.innerHTML='';
