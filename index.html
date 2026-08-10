@@ -994,16 +994,19 @@ function sbLoad(isProg, onDone){
         var totalChunks = metaInfo.totalChunks || 0;
         var meta = metaInfo.meta || {};
         if(totalChunks === 0){ fallbackToLS(); return; }
-        // Load all chunks
-        var allRows = [];
-        var loaded = 0;
+
+        // Show the real "actualizado al" date right away — don't make the user
+        // wait for every chunk to download just to see the correct date.
+        applyMetaOnly(isProg, meta);
+
+        // Load all chunks in parallel instead of one-by-one (much faster for big files)
+        var results = new Array(totalChunks);
+        var remaining = totalChunks;
+        var anyFailed = false;
+        for(var ci=0; ci<totalChunks; ci++){
+          loadChunk(ci);
+        }
         function loadChunk(idx){
-          if(idx >= totalChunks){
-            // All chunks loaded
-            try{ localStorage.setItem(lsKey, JSON.stringify({rows:allRows, meta:meta})); }catch(e){}
-            onDone(200, null, {rows:allRows, meta:meta});
-            return;
-          }
           var chunkUrl = SB_URL+'/storage/v1/object/public/dashboard-files/'+fileName+'_chunk_'+idx+'.json?t='+Date.now();
           var xhrC = new XMLHttpRequest();
           xhrC.open('GET', chunkUrl);
@@ -1012,15 +1015,23 @@ function sbLoad(isProg, onDone){
             if(xhrC.status === 200){
               try{
                 var chunk = JSON.parse(xhrC.responseText);
-                allRows = allRows.concat(chunk.rows || []);
-                loadChunk(idx+1);
-              }catch(e){ fallbackToLS(); }
-            }else{ fallbackToLS(); }
+                results[idx] = chunk.rows || [];
+              }catch(e){ anyFailed = true; }
+            }else{ anyFailed = true; }
+            chunkDone();
           };
-          xhrC.onerror = xhrC.ontimeout = function(){ fallbackToLS(); };
+          xhrC.onerror = xhrC.ontimeout = function(){ anyFailed = true; chunkDone(); };
           xhrC.send();
         }
-        loadChunk(0);
+        function chunkDone(){
+          remaining--;
+          if(remaining>0) return;
+          if(anyFailed){ fallbackToLS(); return; }
+          var allRows = [];
+          for(var k=0;k<results.length;k++){ allRows = allRows.concat(results[k]||[]); }
+          try{ localStorage.setItem(lsKey, JSON.stringify({rows:allRows, meta:meta})); }catch(e){}
+          onDone(200, null, {rows:allRows, meta:meta});
+        }
       }catch(e){ fallbackToLS(); }
     }else{ fallbackToLS(); }
   };
@@ -1135,6 +1146,27 @@ function cExportMismatches(){
   var rows=[['Curso','Legajo','Nombre','Unidad de Negocio (Pais)','Distrito','Depto']];
   C_MISMATCHES.forEach(function(r){rows.push([r.curso,r.legajo,r.nombre,r.pais,r.distrito,r.depto]);});
   downloadCSV(rows.map(function(row){return row.map(function(c){return '"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n'),'inconsistencias_pais_distrito_cursos.csv');
+}
+// Lightweight update of just the info bar (filename/date) — used to show the real
+// upload date immediately once the meta.json arrives, without waiting for all
+// the data chunks to finish downloading (which can take a while for big files).
+function applyMetaOnly(isProg, meta){
+  var isGlobal=(CU==='global');
+  if(isProg){
+    var infoEl = g('dpFileName'); if(infoEl) infoEl.textContent = meta.fileName||'';
+    var ltEl = g('dpLoadTime'); if(ltEl) ltEl.textContent = meta.loadTime||'';
+    var upEl = g('dpUpdateTime'); if(upEl) upEl.textContent = metaUpdateDateStr(meta);
+    var dib = g('dibProg'); if(dib) dib.style.display='flex';
+    var gEl=g('dibProgGlobal'); if(gEl) gEl.style.display=isGlobal?'':'none';
+    var cEl=g('dibProgCountry'); if(cEl) cEl.style.display=isGlobal?'none':'';
+  }else{
+    var infoEl2 = g('dcFileName'); if(infoEl2) infoEl2.textContent = meta.fileName||'';
+    var ltEl2 = g('dcLoadTime'); if(ltEl2) ltEl2.textContent = meta.loadTime||'';
+    var upEl2 = g('dcUpdateTime'); if(upEl2) upEl2.textContent = metaUpdateDateStr(meta);
+    var dib2 = g('dibCurs'); if(dib2) dib2.style.display='flex';
+    var gEl2=g('dibCursGlobal'); if(gEl2) gEl2.style.display=isGlobal?'':'none';
+    var cEl2=g('dibCursCountry'); if(cEl2) cEl2.style.display=isGlobal?'none':'';
+  }
 }
 function applyData(isProg, rows, meta){
   var filtered = CF ? rows.filter(function(r){return CF.indexOf(r.pais)>=0;}) : rows;
