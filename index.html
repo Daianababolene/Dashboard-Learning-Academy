@@ -3269,6 +3269,7 @@ var RM_SELECTED_LEGAJO=null;
 var RM_CONFIG_DRAFT=null;
 
 function rmLoad(){
+  // 1) Show local copy instantly (works offline / while the network fetch below runs)
   try{
     var raw=localStorage.getItem(ROADMAP_KEY);
     if(raw) ROADMAP_STAGES=JSON.parse(raw)||[];
@@ -3281,18 +3282,53 @@ function rmLoad(){
         {id:'e5',plazoLabel:'3 meses',dias:90,label:'Gestión comercial',items:[{tipo:'curso',nombre:''}]},
         {id:'e6',plazoLabel:'6 meses',dias:180,label:'CX Expert',items:[{tipo:'programa',nombre:''}]}
       ];
-      rmSave();
+      rmSaveLocal();
     }
   }catch(e){ ROADMAP_STAGES=[]; }
   try{
     ROADMAP_OVERALL_PROGRAM=localStorage.getItem(ROADMAP_OVERALL_KEY)||'';
   }catch(e){ ROADMAP_OVERALL_PROGRAM=''; }
+
+  // 2) Fetch the shared cloud copy — this is what makes every user (any browser,
+  // any country/training login) see the SAME configuration that global set up,
+  // instead of each browser only seeing what was configured locally on it.
+  var url=SB_URL+'/storage/v1/object/public/dashboard-files/roadmap_config.json?t='+Date.now();
+  var xhr=new XMLHttpRequest();
+  xhr.open('GET',url);
+  xhr.timeout=15000;
+  xhr.onload=function(){
+    if(xhr.status===200){
+      try{
+        var data=JSON.parse(xhr.responseText);
+        if(data && data.stages && data.stages.length){
+          ROADMAP_STAGES=data.stages;
+          ROADMAP_OVERALL_PROGRAM=data.overallProgram||'';
+          try{
+            localStorage.setItem(ROADMAP_KEY,JSON.stringify(ROADMAP_STAGES));
+            localStorage.setItem(ROADMAP_OVERALL_KEY,ROADMAP_OVERALL_PROGRAM);
+          }catch(e){}
+          if(RM_SELECTED_LEGAJO && typeof rmRenderTimeline==='function') rmRenderTimeline(RM_SELECTED_LEGAJO);
+        }
+      }catch(e){}
+    }
+    // If the cloud file doesn't exist yet (first-ever setup), we just keep the local/default copy.
+  };
+  xhr.send();
+}
+function rmSaveLocal(){
+  try{ localStorage.setItem(ROADMAP_KEY,JSON.stringify(ROADMAP_STAGES)); }catch(e){}
+}
+function rmSaveToCloud(cb){
+  var payload=JSON.stringify({stages:ROADMAP_STAGES, overallProgram:ROADMAP_OVERALL_PROGRAM||''});
+  uploadToStorage('roadmap_config.json', payload, function(ok){ if(cb) cb(ok); });
 }
 function rmSave(){
-  try{ localStorage.setItem(ROADMAP_KEY,JSON.stringify(ROADMAP_STAGES)); }catch(e){}
+  rmSaveLocal();
+  rmSaveToCloud(function(){});
 }
 function rmSaveOverallProgram(){
   try{ localStorage.setItem(ROADMAP_OVERALL_KEY,ROADMAP_OVERALL_PROGRAM||''); }catch(e){}
+  rmSaveToCloud(function(){});
 }
 function rmInit(){
   if(!ROADMAP_STAGES.length) rmLoad();
@@ -3709,9 +3745,12 @@ function rmCfgAddItem(si){ RM_CONFIG_DRAFT[si].items.push({tipo:'programa',nombr
 function rmCfgRemoveItem(si,ii){ RM_CONFIG_DRAFT[si].items.splice(ii,1); rmRenderConfigModal(); }
 function rmSaveConfigModal(){
   ROADMAP_STAGES=RM_CONFIG_DRAFT;
-  rmSave();
+  rmSaveLocal();
   rmCloseConfigModal();
   if(RM_SELECTED_LEGAJO) rmRenderTimeline(RM_SELECTED_LEGAJO);
+  rmSaveToCloud(function(ok){
+    if(!ok) alert('El recorrido se guardó en este navegador, pero no se pudo sincronizar con la nube — otros usuarios podrían no ver estos cambios todavía. Probá guardar de nuevo con conexión estable.');
+  });
 }
 
 // ── Initialize Recorrido + Talent Match on enterDash ────────
