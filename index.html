@@ -203,6 +203,7 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
 /* ── GANTT / SEGUIMIENTO TAB ── */
 .tab-btn.active-gantt{color:#22a06b;border-bottom-color:#22a06b}
 .tab-btn.active-recorrido{color:#E97132;border-bottom-color:#E97132}
+.tab-btn.active-fa{color:#3B82F6;border-bottom-color:#3B82F6}
 .gantt-wrap{padding:0 0 80px;background:#f8f9fa;min-height:100vh}
 .gantt-hero{background:#fff;margin:14px 14px 0;border-radius:16px;padding:22px 28px;box-shadow:0 2px 12px rgba(0,0,0,.05);border:1px solid #f0f0f0;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .gantt-hero-left .gantt-eyebrow{font-size:.62rem;font-weight:700;color:#22a06b;text-transform:uppercase;letter-spacing:3px;margin-bottom:4px}
@@ -350,29 +351,23 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
   <div class="loading-text" id="loadingText">Procesando datos...</div>
 </div>
 <div id="uploadModal" class="modal-overlay" style="display:none">
-  <div style="background:#fff;border-radius:16px;padding:28px;width:640px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:500px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
       <h3 style="font-size:1rem;font-weight:700">Gestionar datos</h3>
       <button id="btnCloseModal" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#888;line-height:1">&times;</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div>
-        <div style="font-size:.7rem;font-weight:700;color:#E97132;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Programas</div>
+        <div style="font-size:.72rem;font-weight:700;color:#E97132;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Programas</div>
         <div class="upload-zone" id="uzProg"><div class="upload-zone-icon">&#128202;</div><div class="upload-zone-text">Programas (.xlsx o .csv)</div><div class="upload-zone-sub">Arrastra o haz click</div></div>
         <input type="file" id="fiProg" accept=".xlsx,.xls,.csv" style="display:none">
         <div class="upload-info" id="uiProg"><strong id="uiProgName"></strong><span id="uiProgSize" style="color:#aaa"></span></div>
       </div>
       <div>
-        <div style="font-size:.7rem;font-weight:700;color:#AE90C3;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Cursos</div>
+        <div style="font-size:.72rem;font-weight:700;color:#AE90C3;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Cursos</div>
         <div class="upload-zone" id="uzCurs"><div class="upload-zone-icon">&#128202;</div><div class="upload-zone-text">Cursos (.xlsx o .csv)</div><div class="upload-zone-sub">Arrastra o haz click</div></div>
         <input type="file" id="fiCurs" accept=".xlsx,.xls,.csv" style="display:none">
         <div class="upload-info" id="uiCurs"><strong id="uiCursName"></strong><span id="uiCursSize" style="color:#aaa"></span></div>
-      </div>
-      <div>
-        <div style="font-size:.7rem;font-weight:700;color:#22a06b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Talent Match</div>
-        <div class="upload-zone" id="uzTalent"><div class="upload-zone-icon">&#128202;</div><div class="upload-zone-text">Talent Match (.xlsx o .csv)</div><div class="upload-zone-sub">Arrastra o haz click</div></div>
-        <input type="file" id="fiTalent" accept=".xlsx,.xls,.csv" style="display:none">
-        <div class="upload-info" id="uiTalent"><strong id="uiTalentName"></strong><span id="uiTalentSize" style="color:#aaa"></span></div>
       </div>
     </div>
     <div id="modalStorageInfo" style="margin-top:12px;background:#f8f8f8;border-radius:8px;padding:10px 14px;font-size:.76rem;color:#666;line-height:1.7"></div>
@@ -412,6 +407,7 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
     <button class="tab-btn" id="tabBtnCurs">Cursos</button>
     <button class="tab-btn" id="tabBtnGantt" style="display:none">📋 Seguimiento</button>
     <button class="tab-btn" id="tabBtnRecorrido">🎯 Recorrido</button>
+    <button class="tab-btn" id="tabBtnAnalytics">📈 Formación Analytics</button>
   </div>
   <!-- TAB PROGRAMAS -->
   <div class="tab-content active" id="tabProg">
@@ -756,10 +752,7 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
       <div id="rmProfile" style="display:none">
         <div style="background:#fff;border:1px solid #eee;border-radius:14px;padding:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
           <div>
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <span style="font-weight:700;font-size:1rem;color:#333" id="rmPName">-</span>
-              <span id="rmPTalentBadges" style="display:none;align-items:center;gap:6px"></span>
-            </div>
+            <div style="font-weight:700;font-size:1rem;color:#333" id="rmPName">-</div>
             <div style="font-size:.78rem;color:#888;margin-top:2px">Legajo <span id="rmPLegajo">-</span> &nbsp;|&nbsp; Unidad de Negocio: <span id="rmPPais">-</span> &nbsp;|&nbsp; Distrito: <span id="rmPDistrito">-</span> &nbsp;|&nbsp; Tienda: <span id="rmPTienda">-</span> &nbsp;|&nbsp; Ingreso: <span id="rmPIngreso">-</span></div>
           </div>
           <button onclick="rmClearPerson()" style="background:#f5f5f5;border:1px solid #e0e0e0;padding:6px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;color:#888">Cambiar persona</button>
@@ -812,6 +805,88 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
     </div>
   </div>
 
+  <!-- ================= TAB FORMACIÓN ANALYTICS (NUEVO — no modifica Programas/Cursos) ================= -->
+  <div class="tab-content" id="tabAnalytics">
+    <div class="data-info-bar" id="dibAnalytics" style="background:linear-gradient(90deg,#E6F6EF,#DFF3EA);border-bottom:1px solid #8FD9B6;color:#1F7A50;flex-direction:column;align-items:flex-start;gap:2px">
+      <span>📈 Formación Analytics — evolución mensual y comparación de períodos, calculado sobre los datos de <strong>Programas</strong> (o de Cursos, si filtrás por Curso sin filtrar Programa). Todos los gráficos siguen siempre los filtros de arriba. No incluye vista a nivel persona.</span>
+      <span id="aDateCoverage" style="font-size:.7rem;opacity:.85"></span>
+    </div>
+    <div id="aNoData" class="no-data-state" style="display:none"><div class="nd-icon">&#128200;</div><p>No hay datos de Programas cargados aún.<br>Formación Analytics se calcula sobre esos datos.</p></div>
+    <div id="aMain" style="display:none">
+      <div class="filters-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-size:.88rem;font-weight:700;color:#444">Filtros</span><span id="aFilterCount" style="font-size:.73rem;color:#22a06b;font-weight:600;display:none"></span></div>
+          <button id="aBtnClear" style="background:#f5f5f5;border:1px solid #e0e0e0;padding:4px 12px;border-radius:6px;font-size:.76rem;cursor:pointer;color:#888">Limpiar</button>
+        </div>
+        <div class="filter-grid">
+          <div class="filter-group"><label>País / Unidad de Negocio</label><div id="aFPais" class="multi-select"></div></div>
+          <div class="filter-group"><label>Región</label><div id="aFRegion" class="multi-select"></div></div>
+          <div class="filter-group"><label>Distrito</label><div id="aFDistrito" class="multi-select"></div></div>
+          <div class="filter-group"><label>Programa</label><div id="aFPrograma" class="multi-select"></div></div>
+          <div class="filter-group"><label>Curso</label><div id="aFCurso" class="multi-select"></div></div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:14px;margin-top:14px;flex-wrap:wrap;padding-top:12px;border-top:1px dashed #e5e5e5">
+          <div class="filter-group" style="min-width:170px"><label>Comparar — Período A</label>
+            <select id="aPeriodoA" style="width:100%;padding:7px 9px;border:1.5px solid #e5e5e5;border-radius:8px;font-size:.82rem;background:#fff;outline:none"></select>
+          </div>
+          <div class="filter-group" style="min-width:170px"><label>Comparar — Período B</label>
+            <select id="aPeriodoB" style="width:100%;padding:7px 9px;border:1.5px solid #e5e5e5;border-radius:8px;font-size:.82rem;background:#fff;outline:none"></select>
+          </div>
+          <div style="font-size:.7rem;color:#aaa;max-width:300px">La evolución se expresa siempre en puntos porcentuales (pp) = % Período B − % Período A.</div>
+        </div>
+      </div>
+
+      <!-- BLOQUE 1 — OVERVIEW -->
+      <div class="kpi-area">
+        <div class="kpi-main">
+          <div class="kpi-row">
+            <div class="kpi-card"><div class="kpi-value" id="aKpiGlobalPct">0%</div><div class="kpi-label">% Cumplimiento (alcance filtrado)</div><div style="font-size:.68rem;color:#888;margin-top:4px" id="aKpiGlobalEvo">—</div></div>
+            <div class="kpi-card c5"><div class="kpi-value" id="aKpiProgsActivos">0</div><div class="kpi-label">Programas Activos</div></div>
+          </div>
+          <div class="kpi-row" id="aOverviewProgs" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <!-- BLOQUE 2 — EVOLUCIÓN MENSUAL (sin selector propio: sigue siempre el filtro de Programa/Curso de arriba) -->
+      <div class="chart-container">
+        <div class="chart-title">Evolución mensual
+          <span id="aEvolScopeLabel" style="font-size:.78rem;font-weight:600;color:#E97132"></span>
+        </div>
+        <div id="aEvolC" style="height:320px"></div>
+        <div style="font-size:.68rem;color:#aaa;margin-top:6px">Los meses sin marcador indican que el programa/curso aún no estaba disponible ("No disponible / No lanzado"). El último mes (el actual) usa el estado real de cada registro — coincide con "Tasa Completitud" de Programas/Cursos —; los meses anteriores son una estimación calculada a partir de la fecha de finalización registrada (no todos los registros completados la tienen cargada).</div>
+      </div>
+
+      <!-- BLOQUE 3 — COMPARACIÓN DE PERÍODOS -->
+      <div class="table-section">
+        <div class="table-controls">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-weight:700;font-size:.9rem;color:#444">Comparación de períodos</span></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="a-sort-btn btn-export" data-sort="desc-evo" style="background:#22a06b">Mayor crecimiento</button>
+            <button class="a-sort-btn btn-export" data-sort="asc-evo" style="background:#d9652c">Menor crecimiento</button>
+            <button class="a-sort-btn btn-export" data-sort="desc-cump" style="background:#AE90C3">Mayor cumplimiento</button>
+            <button class="a-sort-btn btn-export" data-sort="asc-cump" style="background:#9D7FBA">Menor cumplimiento</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto" id="aCompareTableWrap"></div>
+      </div>
+
+      <!-- BLOQUE 4 — ANÁLISIS POR DISTRITO -->
+      <div class="table-section" id="aDistrictWrap"></div>
+
+      <!-- BLOQUE 5 — RANKING DE DISTRITOS (se oculta si hay un Distrito puntual seleccionado: no hay nada para comparar) -->
+      <div class="chart-container" id="aRankChartBox"><div class="chart-title">Performance por Distrito <span class="chart-subtitle">según filtros activos</span></div><div id="aRankC" style="height:320px"></div></div>
+      <div class="table-section" id="aRankTableBox"><div style="overflow-x:auto" id="aRankTableWrap"></div></div>
+
+      <!-- BLOQUE 6 — EVOLUCIÓN POR PROGRAMA -->
+      <div class="table-section">
+        <div class="table-controls"><div style="font-weight:700;font-size:.9rem;color:#444">Evolución por programa</div></div>
+        <div style="overflow-x:auto" id="aProgEvolWrap"></div>
+      </div>
+    </div>
+  </div>
+  <!-- ================= FIN TAB FORMACIÓN ANALYTICS ================= -->
+
+
 </div>
 <script>
 // ============================================================
@@ -833,9 +908,7 @@ var BASE={orange:'#E97132',purple:'#AE90C3',yellow:'#F5F378'};
 var CF=null,CU=null,PS=50;
 var P_SORT={col:null,dir:0}; // col=field name, dir=0 none,1 asc,-1 desc
 var C_SORT={col:null,dir:0};
-var pendProg=null,pendCurs=null,pendTalent=null;
-var TM={raw:[]};
-var TM_KEY='xtc_talent_v1';
+var pendProg=null,pendCurs=null;
 var EXCLUDE_STAFF=false;  // toggle state for Programas
 var EXCLUDE_STAFF_C=false; // toggle state for Cursos
 
@@ -1084,7 +1157,7 @@ function restoreData(isProg, onDone){
 
 // ── Clear local cache ───────────────────────────────────────
 function clearAllStoredData(){
-  ['xtc_sb_prog','xtc_sb_curs','xtc_prog_v2','xtc_curs_v2','xtc_talent_v1'].forEach(function(k){
+  ['xtc_sb_prog','xtc_sb_curs','xtc_prog_v2','xtc_curs_v2'].forEach(function(k){
     try{localStorage.removeItem(k);}catch(e){}
   });
 }
@@ -1279,8 +1352,46 @@ function gV(map,aliases){
 }
 function parseDate(v){
   var t=String(v||'').trim();if(!t||t==='-')return{txt:'',date:null};
-  var m=t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if(m){var d=new Date(parseInt(m[3]),parseInt(m[2])-1,parseInt(m[1]));return{txt:m[1].padStart(2,'0')+'/'+m[2].padStart(2,'0')+'/'+m[3],date:d};}
+  // dd/mm/yyyy o dd-mm-yyyy (formato mas comun en los exports de Programas/Cursos)
+  var m=t.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if(m){
+    var d1=parseInt(m[1],10),mo1=parseInt(m[2],10),y1=parseInt(m[3],10);
+    var dt1=new Date(y1,mo1-1,d1);
+    return{txt:String(d1).padStart(2,'0')+'/'+String(mo1).padStart(2,'0')+'/'+y1,date:dt1};
+  }
+  // yyyy-mm-dd o yyyy/mm/dd (ISO) — NUEVO: algunos exports (sobre todo CSV) usan este formato
+  // y antes quedaban sin fecha (date:null) porque no matcheaban el patron anterior.
+  var m2=t.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if(m2){
+    var y2=parseInt(m2[1],10),mo2=parseInt(m2[2],10),d2=parseInt(m2[3],10);
+    var dt2=new Date(y2,mo2-1,d2);
+    return{txt:String(d2).padStart(2,'0')+'/'+String(mo2).padStart(2,'0')+'/'+y2,date:dt2};
+  }
+  // NUEVO: numero de serie de fecha de Excel (dias desde 1899-12-30), aparece cuando una
+  // celda de fecha se exporta a CSV/texto sin formatear.
+  if(/^\d{4,6}(\.\d+)?$/.test(t)){
+    var serial=parseFloat(t);
+    if(serial>20000&&serial<80000){
+      var dt3=new Date(Date.UTC(1899,11,30)+Math.round(serial)*86400000);
+      return{txt:String(dt3.getUTCDate()).padStart(2,'0')+'/'+String(dt3.getUTCMonth()+1).padStart(2,'0')+'/'+dt3.getUTCFullYear(),date:dt3};
+    }
+  }
+  // NUEVO: "1 oct. 2025" / "13 nov 2025" / "3 dic. 2025" — formato de fecha en espanol
+  // abreviado (asi lo muestra Google Sheets con configuracion regional en espanol). El
+  // Date() nativo de JS solo entiende nombres de mes en ingles, asi que sin este bloque
+  // estas fechas quedaban SIEMPRE con date:null (el texto se veia bien en las tablas,
+  // pero el snapshot historico de Formacion Analytics no podia usarlas).
+  var MESES_ES={ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,sept:8,set:8,oct:9,nov:10,dic:11};
+  var m4=t.match(/^(\d{1,2})\s+([a-zA-Z\u00e1\u00e9\u00ed\u00f3\u00fa]{3,4})\.?\s+(\d{4})/);
+  if(m4){
+    var mesTxt=m4[2].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    var mesNum=MESES_ES[mesTxt];
+    if(mesNum!==undefined){
+      var d4=parseInt(m4[1],10),y4=parseInt(m4[3],10);
+      var dt4=new Date(y4,mesNum,d4);
+      return{txt:String(d4).padStart(2,'0')+'/'+String(mesNum+1).padStart(2,'0')+'/'+y4,date:dt4};
+    }
+  }
   var p=new Date(t);
   if(!isNaN(p))return{txt:String(p.getDate()).padStart(2,'0')+'/'+String(p.getMonth()+1).padStart(2,'0')+'/'+p.getFullYear(),date:p};
   return{txt:t,date:null};
@@ -1301,11 +1412,74 @@ function normSt(v){
   if(t==='not complete'||t==='not completed'||t==='in progress'||t==='not yet started')return 'No completado';
   // Spanish values
   if(t==='completado'||t==='completo via rpl'||t==='completar via rpl'||t==='completo via rap'||t==='completar via rap')return 'Completado';
-  // "Completado vía RAP" (or any variant mentioning RAP as a whole word) counts as Completado
+  // "Completado vía RAP" (o cualquier variante que mencione RAP como palabra completa) cuenta como Completado
   if(/\brap\b/.test(t))return 'Completado';
-  if(t.indexOf('completado')>=0&&t.indexOf('no ')<0&&t.indexOf('aun')<0)return 'Completado';
+  // NUEVO: usa la raiz "completad" (sin la vocal final) para cubrir Completado/Completada/
+  // Completados/Completadas — antes solo reconocia la forma masculina singular "completado"
+  // y por eso, en archivos donde el Excel usa "Completada" (ej. Cursos), esas filas se
+  // contaban como "No completado" por error.
+  if(t.indexOf('completad')>=0&&t.indexOf('no ')<0&&t.indexOf('aun')<0)return 'Completado';
   if(t.indexOf('complete')>=0&&t.indexOf('not')<0&&t.indexOf('in progress')<0)return 'Completado';
   return 'No completado';
+}
+// NUEVO: los registros "Completado via RAP" fueron cargados en un proceso masivo sin
+// fecha de finalizacion individual. El usuario confirmo que esa carga masiva ocurrio en
+// Noviembre 2026 — se usa esa fecha como fechaFinDate SOLO cuando no hay una fecha real
+// cargada, para que el snapshot historico de Formacion Analytics no los ignore.
+var RAP_FALLBACK_DATE = new Date(2026,10,1); // 01/11/2026
+function rapFallbackDate(rawEstadoText, existingDate){
+  if(existingDate) return existingDate;
+  if(/\brap\b/i.test(String(rawEstadoText||''))) return RAP_FALLBACK_DATE;
+  return existingDate;
+}
+// NUEVO: la celda "Fecha de Finalizacion" de Programas puede venir con VARIAS fechas
+// concatenadas sin separador (ej. "24 nov. 202529 oct. 202529 oct. 202555 dic. 2025"),
+// porque el proceso de origen va agregando una fecha por cada etapa/intento del programa.
+// Se extraen todas las fechas en formato espanol abreviado "D mmm. YYYY" que aparecen en
+// el texto (el año de EXACTAMENTE 4 digitos permite separar una fecha de la siguiente aun
+// sin separador — la regex global no consume mas de 4 digitos de año, y el resto queda
+// disponible para matchear la fecha siguiente) y se devuelve la MAS RECIENTE (maxima).
+var MESES_ES_EXT={ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,sept:8,set:8,oct:9,nov:10,dic:11};
+function extractMaxSpanishDate(text){
+  var t=String(text||'');
+  // El dia se restringe a un rango valido (1-31, con la alternativa de 2 digitos evaluada
+  // antes que la de 1 digito) porque, al no haber separador entre fechas, el ultimo digito
+  // del anio de una fecha puede quedar pegado al digito de dia de la fecha siguiente
+  // (ej. "...202" + "5 dic. 2025" concatenados se leen como "20255 dic. 2025"). Si se
+  // aceptara cualquier "\d{1,2}" como dia, el motor de regex leeria "55" como dia (invalido,
+  // desborda el mes) en vez de leer correctamente "5" como dia de la fecha siguiente.
+  var re=/(3[01]|[12]\d|0?[1-9])\s+([a-zA-Záéíóú]{3,4})\.?\s+(\d{4})/g;
+  var best=null,m;
+  while((m=re.exec(t))!==null){
+    var mesTxt=m[2].toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    var mesNum=MESES_ES_EXT[mesTxt];
+    if(mesNum===undefined) continue;
+    var d=parseInt(m[1],10),y=parseInt(m[3],10);
+    var dt=new Date(y,mesNum,d);
+    // Validacion extra: si el dia desborda el mes (ej. un dia invalido que igual haya
+    // pasado el filtro anterior), Date() lo "corrige" corriendo al mes siguiente — se
+    // descarta ese resultado comparando que el dia/mes/anio construidos coincidan con
+    // los capturados por la regex.
+    // Rango de anio plausible: descarta lecturas erroneas donde, por texto truncado o
+    // pegado sin separador, la regex termina leyendo un "anio" de 4 digitos que en
+    // realidad mezcla el final de una fecha con el principio de la siguiente.
+    if(isNaN(dt.getTime())||dt.getDate()!==d||dt.getMonth()!==mesNum||dt.getFullYear()!==y||y<2015||y>2035) continue;
+    if(!best||dt>best) best=dt;
+  }
+  return best;
+}
+// NUEVO: envoltorio para el campo "Fecha de Finalizacion" de Programas. Regla explicita
+// del usuario: esa celda puede tener varias fechas (una por etapa), pero solo representa
+// la finalizacion REAL del programa cuando el estado del registro es "Completado" — si el
+// programa esta "en curso"/sin completar, cualquier fecha presente corresponde a una etapa
+// parcial y debe ignorarse (no es la fecha de finalizacion del programa completo).
+function parseProgFechaFin(rawText, estadoNorm){
+  if(estadoNorm!=='Completado') return {txt:'',date:null};
+  var maxD=extractMaxSpanishDate(rawText);
+  if(maxD) return {txt:String(maxD.getDate()).padStart(2,'0')+'/'+String(maxD.getMonth()+1).padStart(2,'0')+'/'+maxD.getFullYear(),date:maxD};
+  // si no se encontro el patron espanol concatenado, se intenta con el parser generico
+  // (cubre el caso de una sola fecha en otro formato: dd/mm/yyyy, ISO, serial de Excel, etc.)
+  return parseDate(rawText);
 }
 function hRgb(hex){var h=hex.replace('#',''),n=parseInt(h,16);return{r:(n>>16)&255,g:(n>>8)&255,b:n&255};}
 function rHex(r,gg,b){return'#'+[r,gg,b].map(function(v){return Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');}).join('');}
@@ -1318,8 +1492,34 @@ function downloadCSV(csv,fn){var blob=new Blob(['\ufeff'+csv],{type:'text/csv;ch
 // ============================================================
 // DATA MAPPING — exact column names from real files
 // ============================================================
+// NUEVO: fallback difuso para columnas cuyo nombre real puede variar (espacios extra,
+// palabras agregadas, etc.) y no calzar exactamente con ninguno de los alias esperados en
+// gV(). Busca, entre los headers YA normalizados, alguno que contenga el fragmento
+// indicado (y no contenga ninguno de los fragmentos a excluir) y devuelve su valor. Se usa
+// como red de seguridad SOLO cuando gV() con los alias exactos no encontro nada — evita que
+// una columna clave (ej. "Fecha de Finalizacion") quede completamente vacia por una simple
+// diferencia de nombre en el archivo real, lo cual arruinaria el snapshot historico de
+// Formacion Analytics para TODOS los meses salvo el actual (ese siempre usa el estado).
+function gVContains(map,mustInclude,mustExclude){
+  var keys=Object.keys(map);
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i];
+    if(k.indexOf(mustInclude)<0) continue;
+    var bad=false;
+    if(mustExclude) for(var j=0;j<mustExclude.length;j++){ if(k.indexOf(mustExclude[j])>=0){ bad=true; break; } }
+    if(bad) continue;
+    if(map[k]!==undefined&&map[k]!==null&&String(map[k]).trim()!=='') return String(map[k]).trim();
+  }
+  return '';
+}
 function mapProgRow(headers,row){
   var map={};for(var i=0;i<headers.length;i++)map[nH(headers[i])]=row[i]!==undefined&&row[i]!==null?String(row[i]):'';
+  var _rawEstado=gV(map,['Estatus del Programa','Program Status']);
+  var _estadoNormProg=normSt(_rawEstado);
+  var _rawFechaFinTxt=gV(map,['Fecha de Finalizacion','Fecha de finalizacion','Fecha finalizacion','Completion Date','FechaFin','Date Completed'])
+                        || gVContains(map,'finaliz');
+  var _fFin=parseProgFechaFin(_rawFechaFinTxt,_estadoNormProg);
+  var _fechaFinDate=rapFallbackDate(_rawEstado,_fFin.date);
   return{
     programa:   gV(map,['Nombre del programa','Program Name']),
     legajo:     gV(map,['Legajo']),
@@ -1332,16 +1532,18 @@ function mapProgRow(headers,row){
     posicion:   gV(map,['Nombre(s) de la(s) posicion(es) del usuario',"User's Position Name(s)",'Position']),
     primerAcceso: gV(map,['Primer Acceso del Usuario','User First Access']),
     progreso:   parseProgreso(gV(map,['Progreso Programa (%)'])),
-    estado:     normSt(gV(map,['Estatus del Programa','Program Status'])),
+    estado:     _estadoNormProg,
     distrito:   gV(map,['Distrito']),
     region:     gV(map,['Region','Regi\u00f3n']),
-    fechaFin:   parseDate(gV(map,['Fecha de Finalizacion','Fecha de finalizacion','Fecha finalizacion','Completion Date','FechaFin','Date Completed'])).txt,
-    fechaFinDate: parseDate(gV(map,['Fecha de Finalizacion','Fecha de finalizacion','Fecha finalizacion','Completion Date','FechaFin','Date Completed'])).date
+    fechaFin:   _fFin.txt||(_fechaFinDate&&_fechaFinDate!==_fFin.date?'01/11/2026 (RAP, estimado)':''),
+    fechaFinDate: _fechaFinDate
   };
 }
 function mapCursRow(headers,row){
   var map={};for(var i=0;i<headers.length;i++)map[nH(headers[i])]=row[i]!==undefined&&row[i]!==null?String(row[i]):'';
+  var _rawEstadoC=gV(map,['Estatus de finalizacion','Estatus de finalizaci\u00f3n']);
   var fFin=parseDate(gV(map,['La fecha de finalizacion','Fecha de finalizacion']));
+  var _fechaFinDateC=rapFallbackDate(_rawEstadoC,fFin.date);
   return{
     curso:      gV(map,['Nombre del Curso','Nombre del curso']),
     legajo:     gV(map,['Numero de ID del usuario','N\u00famero de ID del usuario','Legajo']),
@@ -1350,46 +1552,16 @@ function mapCursRow(headers,row){
     depto:      gV(map,['Departamento (Label)']),
     nombre:     gV(map,['Nombre completo del usuario',"User's Fullname",'Fullname']),
     posicion:   gV(map,['Nombre de la Posicion al finalizar','Nombre de la Posici\u00f3n al finalizar']),
-    estado:     normSt(gV(map,['Estatus de finalizacion','Estatus de finalizaci\u00f3n'])),
+    estado:     normSt(_rawEstadoC),
     progreso:   parseProgreso(gV(map,['Progreso'])),
-    fechaFin:   fFin.txt,
-    fechaFinDate: fFin.date,
+    fechaFin:   fFin.txt||(_fechaFinDateC&&_fechaFinDateC!==fFin.date?'01/11/2026 (RAP, estimado)':''),
+    fechaFinDate: _fechaFinDateC,
     fechaContrDate: parseDate(gV(map,['Fecha de contratacion','Fecha de contrataci\u00f3n'])).date,
     distrito:   gV(map,['Distrito']),
     region:     gV(map,['Region','Regi\u00f3n']),
     calificacion: gV(map,['Calificacion','Calificaci\u00f3n']),
     categoria:  gV(map,['Categoria del Curso','Categor\u00eda del Curso'])
   };
-}
-
-// ── Talent Match: cruce por legajo, mostrado siempre como letra/emoji ──
-function mapTalentRow(headers,row){
-  var map={};for(var i=0;i<headers.length;i++)map[nH(headers[i])]=row[i]!==undefined&&row[i]!==null?String(row[i]):'';
-  return{
-    pais:      gV(map,['Pais','Pa\u00eds']),
-    tienda:    gV(map,['Tienda']),
-    legajo:    gV(map,['ID SF','Id Sf','IDSF','Legajo']),
-    nombre:    gV(map,['Nombre']),
-    cargo:     gV(map,['Cargo']),
-    antiguedad:gV(map,['Antiguedad','Antig\u00fcedad']),
-    potencial: gV(map,['Potencial']),
-    clasif:    gV(map,['Clasif. Calibrada','Clasif Calibrada','Clasificacion Calibrada','Clasificaci\u00f3n Calibrada'])
-  };
-}
-// Devuelve siempre "SI"/"NO"/"-" — nunca la palabra completa del origen
-function tmPotencialLabel(v){
-  var t=String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  if(t==='si'||t==='s'||t==='yes'||t==='y')return 'SI';
-  if(t==='no'||t==='n')return 'NO';
-  return '-';
-}
-// Devuelve siempre letra (P/N/D) + emoji — nunca "Promotor"/"Neutro"/"Detractor" escrito
-function tmClasifBadge(v){
-  var t=String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  if(t.indexOf('promotor')>=0)return {letter:'P',emoji:'😀'};
-  if(t.indexOf('neutro')>=0)return {letter:'N',emoji:'😐'};
-  if(t.indexOf('detractor')>=0)return {letter:'D',emoji:'😕'};
-  return {letter:'-',emoji:'—'};
 }
 
 // ============================================================
@@ -1462,10 +1634,12 @@ function showTabProg(){
   });
   var ganttEl=g('tabGantt');if(ganttEl)ganttEl.style.display='none';
   var rmEl=g('tabRecorrido');if(rmEl)rmEl.style.display='none';
+  var faEl=g('tabAnalytics');if(faEl)faEl.style.display='none';
   var el=g('tabProg');if(el){el.classList.add('active');el.style.display='block';}
   g('tabBtnProg').className='tab-btn active-prog';g('tabBtnCurs').className='tab-btn';
   var gb=g('tabBtnGantt');if(gb&&gb.style.display!=='none')gb.className='tab-btn';
   var rb=g('tabBtnRecorrido');if(rb)rb.className='tab-btn';
+  var fb=g('tabBtnAnalytics');if(fb)fb.className='tab-btn';
   setTimeout(function(){['pC1','pC2','pC3','pC4'].forEach(function(id){var el=document.getElementById(id);if(el&&el.data)Plotly.Plots.resize(el);});},50);
 }
 function showTabCurs(){
@@ -1474,10 +1648,12 @@ function showTabCurs(){
   });
   var ganttEl=g('tabGantt');if(ganttEl)ganttEl.style.display='none';
   var rmEl=g('tabRecorrido');if(rmEl)rmEl.style.display='none';
+  var faEl=g('tabAnalytics');if(faEl)faEl.style.display='none';
   var el=g('tabCurs');if(el){el.classList.add('active');el.style.display='block';}
   g('tabBtnCurs').className='tab-btn active-curs';g('tabBtnProg').className='tab-btn';
   var gb=g('tabBtnGantt');if(gb&&gb.style.display!=='none')gb.className='tab-btn';
   var rb=g('tabBtnRecorrido');if(rb)rb.className='tab-btn';
+  var fb=g('tabBtnAnalytics');if(fb)fb.className='tab-btn';
   setTimeout(function(){['cC1','cC2','cC3','cC4'].forEach(function(id){var el=document.getElementById(id);if(el&&el.data)Plotly.Plots.resize(el);});},50);
 }
 function showTabGantt(){
@@ -1485,11 +1661,13 @@ function showTabGantt(){
     var el=g(id);if(el){el.classList.remove('active');el.style.display='none';}
   });
   var rmEl=g('tabRecorrido');if(rmEl)rmEl.style.display='none';
+  var faEl=g('tabAnalytics');if(faEl)faEl.style.display='none';
   var ganttEl=g('tabGantt');if(ganttEl)ganttEl.style.display='block';
   g('tabBtnProg').className='tab-btn';
   g('tabBtnCurs').className='tab-btn';
   var gb=g('tabBtnGantt');if(gb)gb.className='tab-btn active-gantt';
   var rb=g('tabBtnRecorrido');if(rb)rb.className='tab-btn';
+  var fb=g('tabBtnAnalytics');if(fb)fb.className='tab-btn';
   ganttRender();
 }
 function showTabRecorrido(){
@@ -1497,12 +1675,29 @@ function showTabRecorrido(){
     var el=g(id);if(el){el.classList.remove('active');el.style.display='none';}
   });
   var ganttEl=g('tabGantt');if(ganttEl)ganttEl.style.display='none';
+  var faEl=g('tabAnalytics');if(faEl)faEl.style.display='none';
   var rmEl=g('tabRecorrido');if(rmEl)rmEl.style.display='block';
   g('tabBtnProg').className='tab-btn';
   g('tabBtnCurs').className='tab-btn';
   var gb=g('tabBtnGantt');if(gb&&gb.style.display!=='none')gb.className='tab-btn';
   g('tabBtnRecorrido').className='tab-btn active-recorrido';
+  var fb=g('tabBtnAnalytics');if(fb)fb.className='tab-btn';
   rmInit();
+}
+function showTabAnalytics(){
+  ['tabProg','tabCurs'].forEach(function(id){
+    var el=g(id);if(el){el.classList.remove('active');el.style.display='none';}
+  });
+  var ganttEl=g('tabGantt');if(ganttEl)ganttEl.style.display='none';
+  var rmEl=g('tabRecorrido');if(rmEl)rmEl.style.display='none';
+  var faEl=g('tabAnalytics');if(faEl)faEl.style.display='block';
+  g('tabBtnProg').className='tab-btn';
+  g('tabBtnCurs').className='tab-btn';
+  var gb=g('tabBtnGantt');if(gb&&gb.style.display!=='none')gb.className='tab-btn';
+  var rb=g('tabBtnRecorrido');if(rb)rb.className='tab-btn';
+  g('tabBtnAnalytics').className='tab-btn active-fa';
+  aDoFilter();
+  setTimeout(function(){['aEvolC','aRankC'].forEach(function(id){var el=document.getElementById(id);if(el&&el.data)Plotly.Plots.resize(el);});},50);
 }
 
 
@@ -1518,6 +1713,9 @@ function refreshTabProg(){
     var tabInf=g('tabInforme');
     if(tabInf&&tabInf.style.display==='block')renderInforme();
   }else{g('pNoData').style.display='block';g('pMain').style.display='none';}
+  // NUEVO: refrescar Formacion Analytics si esta visible (depende de P.raw)
+  var tabA=g('tabAnalytics');
+  if(tabA&&tabA.style.display==='block')aDoFilter();
 }
 function refreshTabCurs(){
   if(C.raw.length>0){
@@ -1534,6 +1732,9 @@ function refreshTabCurs(){
     rmRenderConfigModal();
     if(typeof rmRenderOverallSelect==='function') rmRenderOverallSelect();
   }
+  // NUEVO: refrescar Formacion Analytics (usa Cursos solo para el selector de evolucion)
+  var tabA2=g('tabAnalytics');
+  if(tabA2&&tabA2.style.display==='block')aDoFilter();
 }
 
 // ============================================================
@@ -1571,9 +1772,9 @@ function loadAccessLog(){
 }
 
 function openModal(){
-  pendProg=null;pendCurs=null;pendTalent=null;
-  g('uiProg').style.display='none';g('uiCurs').style.display='none';g('uiTalent').style.display='none';
-  g('fiProg').value='';g('fiCurs').value='';g('fiTalent').value='';
+  pendProg=null;pendCurs=null;
+  g('uiProg').style.display='none';g('uiCurs').style.display='none';
+  g('fiProg').value='';g('fiCurs').value='';
   g('modalStorageInfo').innerHTML = getStorageInfo();
   var logSection=g('accessLogSection');
   if(logSection){
@@ -1597,22 +1798,9 @@ function setUpFile(file,isProg){
   if(isProg){pendProg=file;g('uiProgName').textContent=file.name;g('uiProgSize').textContent=' - '+sz;g('uiProg').style.display='block';}
   else{pendCurs=file;g('uiCursName').textContent=file.name;g('uiCursSize').textContent=' - '+sz;g('uiCurs').style.display='block';}
 }
-function setupUZTalent(zoneId,inputId){
-  var z=g(zoneId),inp=g(inputId);
-  z.addEventListener('click',function(){inp.click();});
-  z.addEventListener('dragover',function(e){e.preventDefault();z.classList.add('dragover');});
-  z.addEventListener('dragleave',function(){z.classList.remove('dragover');});
-  z.addEventListener('drop',function(e){e.preventDefault();z.classList.remove('dragover');var f=e.dataTransfer.files[0];if(f)setUpTalentFile(f);});
-  inp.addEventListener('change',function(e){if(e.target.files[0])setUpTalentFile(e.target.files[0]);});
-}
-function setUpTalentFile(file){
-  if(!file.name.match(/\.(xlsx|xls|csv)$/i)){alert('Selecciona un archivo Excel (.xlsx o .xls)');return;}
-  var sz=(file.size/1024).toFixed(1)+' KB';
-  pendTalent=file;g('uiTalentName').textContent=file.name;g('uiTalentSize').textContent=' - '+sz;g('uiTalent').style.display='block';
-}
 
 function applyUploads(){
-  if(!pendProg&&!pendCurs&&!pendTalent){alert('Selecciona al menos un archivo.');return;}
+  if(!pendProg&&!pendCurs){alert('Selecciona al menos un archivo.');return;}
   closeModal();
   g('loadingOverlay').style.display='flex';
   g('loadingText').textContent='Procesando archivos...';
@@ -1623,17 +1811,11 @@ function applyUploads(){
 }
 function processQueue(queue,idx){
   if(idx>=queue.length){
-    if(pendTalent){
-      readTalentExcel(pendTalent,function(){
-        g('loadingOverlay').style.display='none';
-        refreshTabProg();refreshTabCurs();
-        if(RM_SELECTED_LEGAJO)rmRenderTimeline(RM_SELECTED_LEGAJO);
-      });
-      return;
-    }
     // Hide loading immediately — don't wait for Supabase sync
     g('loadingOverlay').style.display='none';
     refreshTabProg();refreshTabCurs();
+    // Process talent if pending
+
     return;
   }
   setTimeout(function(){readExcel(queue[idx].file,queue[idx].isProg,function(){processQueue(queue,idx+1);});},50);
@@ -1802,6 +1984,7 @@ function readExcel(file,isProg,cb){
 function initAllMS(){
   initMSForState(P,function(){pDoFilter();});
   initMSForState(C,function(){cDoFilter();});
+  initMSForState(A,function(){aDoFilter();});
 }
 function initMSForState(state,triggerFn){
   state.cfg.forEach(function(cfg){
@@ -2616,24 +2799,13 @@ function mkPag(divId,state,tp,renderFn){
 // WIRE EVENTS
 // ============================================================
 
-// Some files declare a stale/wrong used-range (!ref) — recompute it for real by
-// scanning the actual populated cells, as a fallback when sheet_to_json returns
-// suspiciously few rows despite the sheet clearly having more data.
-function xlsxColLetter(n){var s='';while(n>0){var r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);}return s;}
-function xlsxRealRange(ws){
-  var maxRow=0,maxCol=0;
-  for(var key in ws){
-    if(key.charAt(0)==='!')continue;
-    var m=key.match(/^([A-Z]+)(\d+)$/);
-    if(!m)continue;
-    var col=0;
-    for(var i=0;i<m[1].length;i++){col=col*26+(m[1].charCodeAt(i)-64);}
-    var row=parseInt(m[2],10);
-    if(row>maxRow)maxRow=row;
-    if(col>maxCol)maxCol=col;
-  }
-  return {maxRow:maxRow,maxCol:maxCol};
+// ============================================================
+var T={raw:[],joined:[],page:1},T_PS=50;
+function mapTalentRow(headers,row){
+  var map={};for(var i=0;i<headers.length;i++)map[headers[i].toString().trim().toLowerCase().replace(/[^a-z0-9]/g,'')]=String(row[i]||'').trim();
+  return{legajo:map['legajo']||map['nrodocumento']||map['id']||'',matchCult:map['matchcultural']||map['match']||'',potencial:map['potencialdedesarrollo']||map['potencial']||''};
 }
+
 function readExcelRaw(file,cb){
   var isCSV=file.name.toLowerCase().endsWith('.csv');
   var reader=new FileReader();
@@ -2641,94 +2813,12 @@ function readExcelRaw(file,cb){
     try{
       var rows;
       if(isCSV){var text=e.target.result;if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);rows=parseCSVtext(text);}
-      else{
-        var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
-        var ws=wb.Sheets[wb.SheetNames[0]];
-        rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,dateNF:'dd/mm/yyyy'});
-        if(rows.length<=1){
-          var real=xlsxRealRange(ws);
-          if(real.maxRow>1){
-            ws['!ref']='A1:'+xlsxColLetter(real.maxCol||1)+real.maxRow;
-            rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,dateNF:'dd/mm/yyyy'});
-          }
-        }
-      }
+      else{var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});var ws=wb.Sheets[wb.SheetNames[0]];rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,dateNF:'dd/mm/yyyy'});}
       cb(rows);
     }catch(err){g('loadingOverlay').style.display='none';alert('Error leyendo archivo: '+err.message);cb([]);}
   };
   reader.onerror=function(){g('loadingOverlay').style.display='none';alert('Error leyendo el archivo.');cb([]);};
   isCSV?reader.readAsText(file,'UTF-8'):reader.readAsArrayBuffer(file);
-}
-
-// ── Talent Match: archivo chico, un solo blob en Supabase Storage (sin chunks) ──
-function readTalentExcel(file,cb){
-  readExcelRaw(file,function(rows){
-    try{
-      if(!rows||rows.length<2){ alert('El archivo '+file.name+' no tiene datos suficientes.'); cb(); return; }
-      // Auto-detect the real header row (in case there's a title/metadata row above it,
-      // same logic used for Programas/Cursos) instead of assuming row 0 is always the header.
-      var headerRowIdx=0;
-      for(var ri=0;ri<Math.min(10,rows.length);ri++){
-        var r0=rows[ri]||[];
-        var nonEmpty=r0.filter(function(v){return v!==null&&v!==undefined&&String(v).trim()!=='';}).length;
-        var normd=r0.map(function(v){return nH(v);});
-        var looksLikeHeader = normd.indexOf('idsf')>=0 || (normd.indexOf('nombre')>=0 && normd.indexOf('pais')>=0);
-        if(looksLikeHeader){ headerRowIdx=ri; break; }
-        if(ri===0 && nonEmpty>=3) headerRowIdx=0; // fallback: assume first non-trivial row if nothing better matches
-      }
-      var dataRows=rows.slice(headerRowIdx);
-      var headers=dataRows[0].map(function(h){return String(h||'').trim();});
-      var mapped=[];
-      var skipped=0;
-      for(var i=1;i<dataRows.length;i++){
-        var cleanRow=dataRows[i].map(function(v){return String(v===null||v===undefined?'':v).trim();});
-        var r=mapTalentRow(headers,cleanRow);
-        // Skip only truly broken rows (e.g. "#N/A" from a failed lookup in the source file).
-        // Rows with a valid nombre but no Clasif. Calibrada yet (pending calibration) are kept —
-        // they'll just show the Desarrollo badge without a Perfil badge.
-        if(r.nombre==='#N/A'){ skipped++; continue; }
-        if(r.legajo||r.nombre)mapped.push(r);
-      }
-      if(!mapped.length){
-        var sampleRaw=dataRows[1]?JSON.stringify(dataRows[1]):'(sin fila 1)';
-        var sampleClean=dataRows[1]?JSON.stringify(dataRows[1].map(function(v){return String(v===null||v===undefined?'':v).trim();})):'-';
-        var sampleMapped=dataRows[1]?JSON.stringify(mapTalentRow(headers,dataRows[1].map(function(v){return String(v===null||v===undefined?'':v).trim();}))):'-';
-        console.warn('Talent Match — headers:', headers, '| fila 1 cruda:', dataRows[1], '| mapeado:', sampleMapped);
-        alert('No se detectaron registros validos en '+file.name+'.\nFilas totales leidas: '+rows.length+' (fila de encabezado + '+(dataRows.length-1)+' filas de datos detectadas)\nColumnas detectadas: '+headers.join(', ')+'\n\n--- DIAGNOSTICO (fila 1 de datos) ---\nCruda: '+sampleRaw+'\nLimpia: '+sampleClean+'\nMapeada: '+sampleMapped);
-        cb();return;
-      }
-      TM.raw=mapped;
-      try{ localStorage.setItem(TM_KEY,JSON.stringify(mapped)); }catch(e){}
-      cb();
-      tmSave(mapped,function(){});
-    }catch(err){ console.error(err); alert('Error procesando '+file.name+': '+err.message); cb(); }
-  });
-}
-function tmSave(rows,cb){
-  uploadToStorage('talentmatch.json',JSON.stringify({rows:rows}),function(ok){ if(cb)cb(ok); });
-}
-function tmLoad(){
-  try{
-    var raw=localStorage.getItem(TM_KEY);
-    if(raw) TM.raw=JSON.parse(raw)||[];
-  }catch(e){ TM.raw=[]; }
-  var url=SB_URL+'/storage/v1/object/public/dashboard-files/talentmatch.json?t='+Date.now();
-  var xhr=new XMLHttpRequest();
-  xhr.open('GET',url);
-  xhr.timeout=15000;
-  xhr.onload=function(){
-    if(xhr.status===200){
-      try{
-        var data=JSON.parse(xhr.responseText);
-        if(data&&data.rows&&data.rows.length){
-          TM.raw=data.rows;
-          try{ localStorage.setItem(TM_KEY,JSON.stringify(data.rows)); }catch(e){}
-          if(RM_SELECTED_LEGAJO && typeof rmRenderTimeline==='function') rmRenderTimeline(RM_SELECTED_LEGAJO);
-        }
-      }catch(e){}
-    }
-  };
-  xhr.send();
 }
 
 
@@ -2777,6 +2867,434 @@ function mkCountry(c,pct,comp,total){
     '</div>';
 }
 
+// ============================================================
+// FORMACIÓN ANALYTICS (NUEVO)
+// ------------------------------------------------------------
+// No modifica P (Programas) ni C (Cursos): sólo LEE P.raw / C.raw
+// (que ya respetan el permiso por país aplicado en applyData/CF)
+// y agrega su propio estado de filtros "A".
+//
+// DEFINICIONES / SUPUESTOS (documentados por pedido explícito):
+// 1) "Formación Global" = % de asignaciones persona×programa con
+//    estado Completado sobre el total de asignaciones vigentes en
+//    el alcance filtrado (mismo criterio que "Tasa Completitud" en
+//    la pestaña Programas — ver calcK). Es un promedio PONDERADO,
+//    no el promedio simple de los % de cada programa.
+// 2) SNAPSHOT HISTÓRICO: el archivo de Programas no tiene una
+//    columna de "fecha de asignación al programa"; sólo existen
+//    "Fecha de contratación" (ingreso del colaborador, no del
+//    programa) y "Fecha de Finalización" (fecha real de
+//    completado). Por lo tanto:
+//      - el numerador de cada mes SÍ es exacto: se cuentan las
+//        finalizaciones con fechaFinDate <= fin de ese mes.
+//      - el denominador usa la población ACTUALMENTE asignada
+//        (no hay forma de saber, con los datos actuales, cuántas
+//        personas tenían el programa asignado en un mes pasado).
+//    Esto es una ESTIMACIÓN razonable para ver tendencia y
+//    detectar meses "no lanzado", pero no es un snapshot exacto.
+//    Si se necesita precisión histórica real, la columna que
+//    falta es una "Fecha de asignación de programa" por registro.
+// 3) "No disponible / No lanzado": se calcula a partir del mes de
+//    la primera finalización registrada (mínima fechaFinDate) del
+//    programa/curso en el alcance. Meses anteriores a ese mes se
+//    muestran como N/D en vez de 0%, para no penalizar programas
+//    lanzados después. Si el programa nunca tuvo finalizaciones,
+//    se muestra el % (0% si corresponde) para todos los meses, ya
+//    que no hay evidencia de una fecha de lanzamiento distinta.
+// ============================================================
+var A = makeState([
+  {id:'aFPais',ph:'Todos'},{id:'aFRegion',ph:'Todas'},{id:'aFDistrito',ph:'Todos'},
+  {id:'aFPrograma',ph:'Todos'},{id:'aFCurso',ph:'Todos'}
+]);
+var _aSortMode='desc-evo';
+
+function aMonthKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function aMonthLabel(key){
+  var MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  var p=key.split('-'); return MESES[parseInt(p[1],10)-1]+' '+p[0];
+}
+function aEndOfMonth(key){
+  var p=key.split('-'); return new Date(parseInt(p[0],10), parseInt(p[1],10), 0, 23,59,59);
+}
+function aAddMonths(key,n){
+  var p=key.split('-'); var d=new Date(parseInt(p[0],10), parseInt(p[1],10)-1+n, 1);
+  return aMonthKey(d);
+}
+// NUEVO: decisión general del usuario — Formación Analytics solo muestra desde Enero 2026
+// en adelante (se sacan Oct/Nov/Dic 2025 de la vista). Nada de lo completado en 2025 se
+// pierde: como el acumulado de cada mes se calcula con "fechaFinDate <= fin de ese mes",
+// cualquier finalización de 2025 queda incluida automáticamente dentro del acumulado de
+// Enero 2026 (no hace falta ninguna lógica extra de agrupación) — de ahí en adelante cada
+// mes usa su fecha real, como ya funcionaba.
+var ANALYTICS_START_MONTH='2026-01';
+function aGetMonthList(){
+  var maxD=new Date();
+  (P.raw||[]).forEach(function(r){ if(r.fechaFinDate && !isNaN(r.fechaFinDate.getTime()) && r.fechaFinDate>maxD) maxD=r.fechaFinDate; });
+  (C.raw||[]).forEach(function(r){ if(r.fechaFinDate && !isNaN(r.fechaFinDate.getTime()) && r.fechaFinDate>maxD) maxD=r.fechaFinDate; });
+  var startKey=ANALYTICS_START_MONTH, endKey=aMonthKey(maxD);
+  if(endKey<startKey) endKey=startKey;
+  var months=[], cur=startKey, guard=0;
+  while(guard++<240){
+    months.push(cur);
+    if(cur===endKey) break;
+    cur=aAddMonths(cur,1);
+  }
+  return months;
+}
+// Reconstruye, para cada mes, {pct,n,done} o {pct:null} si no hay datos / no lanzado.
+// IMPORTANTE (corregido): muchos registros reales tienen estado="Completado" pero SIN
+// fecha de finalización cargada (completados via RPL/RAP, migraciones, datos legacy,
+// etc.). Si el numerador de TODOS los meses dependiera solo de fechaFinDate, el mes
+// actual quedaría subestimado frente al valor real (el mismo que muestra "Tasa
+// Completitud" en Programas/Cursos). Por eso el ÚLTIMO mes de la serie (el "hoy" del
+// dashboard) usa el estado real de cada registro — coincide siempre con Programas/
+// Cursos —, y solo los meses ANTERIORES usan la reconstrucción por fechaFinDate
+// (la única fuente disponible para saber si ya estaba completo en un mes pasado).
+function aSnapshot(rows, months){
+  var total=rows.length;
+  if(!total) return months.map(function(mKey){ return {key:mKey,pct:null,n:0,done:0}; });
+  var doneNow=0;
+  rows.forEach(function(r){ if(r.estado==='Completado') doneNow++; });
+  var minCompletedDate=null;
+  rows.forEach(function(r){ if(r.fechaFinDate && (!minCompletedDate||r.fechaFinDate<minCompletedDate)) minCompletedDate=r.fechaFinDate; });
+  var launchKey = minCompletedDate ? aMonthKey(minCompletedDate) : null;
+  var lastKey = months.length ? months[months.length-1] : null;
+  return months.map(function(mKey){
+    if(mKey===lastKey){
+      // Mes actual: estado real (exacto), no depende de que fechaFinDate este poblada.
+      return {key:mKey,pct:Math.round(doneNow/total*100),n:total,done:doneNow,estimated:false};
+    }
+    if(launchKey && mKey<launchKey) return {key:mKey,pct:null,n:total,done:0,estimated:true};
+    var endD=aEndOfMonth(mKey), done=0;
+    rows.forEach(function(r){ if(r.fechaFinDate && r.fechaFinDate<=endD) done++; });
+    return {key:mKey,pct:Math.round(done/total*100),n:total,done:done,estimated:true};
+  });
+}
+function aPP(b,a){ if(a==null||b==null) return null; return b-a; }
+function aEvoBadge(evo){
+  if(evo==null) return '<span class="bench-neutral">—</span>';
+  if(evo>0) return '<span class="bench-up">&#9650; +'+evo+' pp</span>';
+  if(evo<0) return '<span class="bench-down">&#9660; '+evo+' pp</span>';
+  return '<span class="bench-neutral">0 pp</span>';
+}
+
+// ---- Filtros / alcance ----
+function aGetSel(id){ return Object.keys(A.fSel[id]||{}); }
+function aOrgFilterRow(r){
+  var sP=aGetSel('aFPais'), sR=aGetSel('aFRegion'), sD=aGetSel('aFDistrito');
+  if(sP.length && sP.indexOf(r.pais)<0) return false;
+  if(sR.length && sR.indexOf(r.region)<0) return false;
+  if(sD.length && sD.indexOf(r.distrito)<0) return false;
+  return true;
+}
+function aScopeProgRows(){
+  var sProg=aGetSel('aFPrograma');
+  return (P.raw||[]).filter(function(r){
+    if(!aOrgFilterRow(r)) return false;
+    if(sProg.length && sProg.indexOf(r.programa)<0) return false;
+    return true;
+  });
+}
+function aScopeCursRows(){
+  var sCurs=aGetSel('aFCurso');
+  return (C.raw||[]).filter(function(r){
+    if(!aOrgFilterRow(r)) return false;
+    if(sCurs.length && sCurs.indexOf(r.curso)<0) return false;
+    return true;
+  });
+}
+function aCountFilters(){
+  var n=0; A.cfg.forEach(function(f){ if(Object.keys(A.fSel[f.id]||{}).length) n++; });
+  return n;
+}
+function aBadge(){
+  var n=aCountFilters(), el=g('aFilterCount');
+  if(n>0){ el.textContent=n+' filtro'+(n>1?'s':'')+' activo'+(n>1?'s':''); el.style.display='inline'; }
+  else el.style.display='none';
+}
+function aPopulate(){
+  setOpts(A,'aFPais', (P.raw||[]).map(function(r){return r.pais;}), true, aDoFilter);
+  var sP=aGetSel('aFPais');
+  var baseRegion = sP.length ? (P.raw||[]).filter(function(r){return sP.indexOf(r.pais)>=0;}) : (P.raw||[]);
+  setOpts(A,'aFRegion', baseRegion.map(function(r){return r.region;}), true, aDoFilter);
+  var sR=aGetSel('aFRegion');
+  var baseDist = baseRegion.filter(function(r){ return !sR.length || sR.indexOf(r.region)>=0; });
+  setOpts(A,'aFDistrito', baseDist.map(function(r){return r.distrito;}), true, aDoFilter);
+  setOpts(A,'aFPrograma', (P.raw||[]).map(function(r){return r.programa;}), true, aDoFilter);
+  setOpts(A,'aFCurso', (C.raw||[]).map(function(r){return r.curso;}), true, aDoFilter);
+}
+function aClear(){
+  A.cfg.forEach(function(f){ A.fSel[f.id]={}; });
+  aDoFilter();
+}
+function aCheckData(){
+  if((P.raw||[]).length>0){ g('aNoData').style.display='none'; g('aMain').style.display='block'; return true; }
+  g('aNoData').style.display='block'; g('aMain').style.display='none'; return false;
+}
+
+// ---- Selectores de período / indicador ----
+function aFillPeriodSelectors(){
+  // NOTA: no usar "if(!sel.value)" para detectar primer render — al fijar innerHTML con
+  // <option>, el navegador auto-selecciona la primera opcion y sel.value queda "verdadero"
+  // aunque el usuario nunca elijio nada. Se usa sel.dataset.filled para distinguir
+  // "ya renderizado antes" (preservar seleccion) de "primer render" (aplicar default).
+  var months=aGetMonthList();
+  ['aPeriodoA','aPeriodoB'].forEach(function(id){
+    var sel=g(id);
+    var prevVal = sel.dataset.filled==='1' ? sel.value : null;
+    sel.innerHTML=months.map(function(m){return '<option value="'+m+'">'+aMonthLabel(m)+'</option>';}).join('');
+    if(prevVal && months.indexOf(prevVal)>=0){
+      sel.value=prevVal;
+    }else{
+      sel.value = (id==='aPeriodoA') ? months[Math.max(0,months.length-2)] : months[months.length-1];
+    }
+    sel.dataset.filled='1';
+  });
+}
+// NUEVO: se eliminó por completo el selector interno "Evolución mensual" (aEvolIndicator).
+// El usuario reportó, incluso después de acotarlo al alcance filtrado (corrección previa),
+// que seguía siendo un control CON ESTADO PROPIO que "se quedaba pegado" en un programa
+// aunque cambiara los filtros principales de arriba — exactamente el problema que se venía
+// arrastrando de rondas anteriores ("un único filtro debe gobernar todo, sin controles
+// independientes por gráfico"). Ahora este gráfico no tiene ningún control propio: muestra
+// SIEMPRE la evolución de lo que ya está filtrado arriba (mismas filas que usa el KPI
+// principal de Overview), así que nunca puede quedar desincronizado. Si el filtro de Curso
+// tiene algo elegido Y el de Programa está vacío, se usa el alcance de Cursos (para no dejar
+// ese filtro sin efecto en este gráfico); en cualquier otro caso se usa el alcance de
+// Programas — que es el caso por defecto y el más común.
+function aEvolScope(){
+  var sProg=aGetSel('aFPrograma'), sCurso=aGetSel('aFCurso');
+  if(sCurso.length && !sProg.length){
+    return { rows: aScopeCursRows(), label: sCurso.length===1?('Curso: '+sCurso[0]):(sCurso.length+' cursos filtrados') };
+  }
+  return { rows: aScopeProgRows(), label: sProg.length===1?sProg[0]:(sProg.length?(sProg.length+' programas filtrados'):'Programas — alcance filtrado') };
+}
+
+// NUEVO: único punto donde se resuelven los selectores "Comparar — Período A/B" a claves
+// de mes concretas ({keyA,keyB,idxA,idxB}). Antes cada bloque (Overview, Comparación de
+// períodos, Distrito, Ranking) repetía esta misma lógica por separado, y Overview ni
+// siquiera la usaba — mostraba SIEMPRE "mes actual vs mes anterior" sin importar lo que el
+// usuario elija en Período A/B (por eso la evolución de las tarjetas de Overview quedaba
+// fija en "vs Jul 2026" aunque se cambiara el selector). Ahora los 4 bloques usan esta
+// misma función, así que cambiar Período A/B afecta a todo el tab de manera consistente.
+function aGetPeriodKeys(months){
+  var keyA=g('aPeriodoA').value||months[Math.max(0,months.length-2)];
+  var keyB=g('aPeriodoB').value||months[months.length-1];
+  return {keyA:keyA, keyB:keyB, idxA:months.indexOf(keyA), idxB:months.indexOf(keyB)};
+}
+
+// ---- BLOQUE 1: Overview ----
+function aOverview(){
+  var months=aGetMonthList();
+  var pk=aGetPeriodKeys(months);
+  var rows=aScopeProgRows();
+  var snap=aSnapshot(rows,months);
+  var bVal=pk.idxB>=0?snap[pk.idxB]:null, aVal=pk.idxA>=0?snap[pk.idxA]:null;
+  g('aKpiGlobalPct').textContent = (bVal&&bVal.pct!=null)?bVal.pct+'%':'N/D';
+  var d = (aVal&&bVal)?aPP(bVal.pct,aVal.pct):null;
+  g('aKpiGlobalEvo').innerHTML = aVal ? (aEvoBadge(d)+' vs '+aMonthLabel(pk.keyA)) : '—';
+
+  var byProg={};
+  rows.forEach(function(r){ if(r.programa) (byProg[r.programa]=byProg[r.programa]||[]).push(r); });
+  var progNames=Object.keys(byProg).sort(function(a,b){return byProg[b].length-byProg[a].length;}).slice(0,4);
+  var wrap=g('aOverviewProgs'); wrap.innerHTML='';
+  progNames.forEach(function(pName){
+    var pRows=byProg[pName];
+    var pSnap=aSnapshot(pRows,months);
+    var pB=pk.idxB>=0?pSnap[pk.idxB]:null, pA=pk.idxA>=0?pSnap[pk.idxA]:null;
+    var pd = (pA&&pB)?aPP(pB.pct,pA.pct):null;
+    var evoHtml = (pB&&pB.pct==null) ? '<span class="bench-neutral">No lanzado</span>' : (pA?(aEvoBadge(pd)+' vs '+aMonthLabel(pk.keyA)):'—');
+    wrap.innerHTML += '<div class="kpi-card c2"><div class="kpi-value">'+((pB&&pB.pct!=null)?pB.pct+'%':'N/D')+'</div><div class="kpi-label" title="'+esc(pName)+'">'+esc(trunc(pName,26))+'</div><div style="font-size:.66rem;margin-top:4px">'+evoHtml+'</div></div>';
+  });
+  g('aKpiProgsActivos').textContent = Object.keys(byProg).length;
+  aDateCoverageNote(rows);
+}
+
+// Diagnostico: cuantos registros "Completado" en el alcance actual tienen fecha de
+// finalizacion cargada. Si este numero es bajo, la reconstruccion de meses ANTERIORES
+// al actual (Bloque 2/3/4/5/6) va a subestimar esos meses — no es un error de calculo,
+// es un dato que falta en el archivo fuente. El mes actual nunca depende de esto (usa
+// el estado real).
+function aDateCoverageNote(rows){
+  var el=g('aDateCoverage');
+  if(!el||!el.style) return;
+  var completados=0, conFecha=0;
+  rows.forEach(function(r){
+    if(r.estado==='Completado'){ completados++; if(r.fechaFinDate) conFecha++; }
+  });
+  if(!completados){ el.textContent=''; return; }
+  var pct=Math.round(conFecha/completados*100);
+  var txt='De los '+completados.toLocaleString()+' registros "Completado" en el alcance actual, '+conFecha.toLocaleString()+' ('+pct+'%) tienen fecha de finalización cargada.';
+  if(pct<50) txt+=' Con esa cobertura, los meses ANTERIORES al actual van a mostrar valores muy por debajo de la realidad — es una limitación del dato de origen, no del cálculo. El mes actual siempre es exacto.';
+  el.textContent=txt;
+}
+
+// ---- BLOQUE 2: Evolución mensual ----
+function aEvolChart(){
+  var months=aGetMonthList();
+  var scope=aEvolScope(), rows=scope.rows;
+  var lbl=g('aEvolScopeLabel'); if(lbl) lbl.textContent=scope.label;
+  if(!months.length){ Plotly.purge('aEvolC'); return; }
+  var snap=aSnapshot(rows,months);
+  var y=snap.map(function(s){return s.pct;});
+  var text=snap.map(function(s){
+    if(s.pct==null) return 'No disponible / No lanzado';
+    return s.pct+'% ('+s.done+'/'+s.n+')'+(s.estimated?' — estimado':' — actual');
+  });
+  var x=months.map(aMonthLabel);
+  Plotly.newPlot('aEvolC',[{
+    x:x, y:y, type:'scatter', mode:'lines+markers',
+    line:{color:BASE.orange,width:3,shape:'spline'}, marker:{size:7,color:BASE.orange},
+    connectgaps:false, text:text, hovertemplate:'%{x}<br>%{text}<extra></extra>'
+  }],{
+    margin:{l:44,r:20,t:10,b:36}, font:{family:'Inter',size:11},
+    yaxis:{range:[0,100],ticksuffix:'%'}, xaxis:{tickangle:0}
+  },{displayModeBar:false,responsive:true});
+}
+
+// ---- BLOQUE 3: Comparación de períodos ----
+function aCompareTable(){
+  var months=aGetMonthList();
+  var pk=aGetPeriodKeys(months), keyA=pk.keyA, keyB=pk.keyB, idxA=pk.idxA, idxB=pk.idxB;
+  var rows=aScopeProgRows();
+  var byProg={}; rows.forEach(function(r){ if(r.programa) (byProg[r.programa]=byProg[r.programa]||[]).push(r); });
+  // NUEVO: se sacó la fila "Formación Global" (pedido explícito del usuario) — solo queda
+  // el detalle por programa, que es el dato que sí existe en sus reportes de origen.
+  var indicators=[];
+  Object.keys(byProg).sort(function(a,b){return a.localeCompare(b,'es');}).forEach(function(p){indicators.push({name:p,rows:byProg[p]});});
+  var out=indicators.map(function(ind){
+    var snap=aSnapshot(ind.rows,months);
+    var a=idxA>=0?snap[idxA]:null, b=idxB>=0?snap[idxB]:null;
+    var evo=(a&&b&&a.pct!=null&&b.pct!=null)?b.pct-a.pct:null;
+    return {name:ind.name, a:a?a.pct:null, b:b?b.pct:null, evo:evo};
+  });
+  out.sort(function(x,y){
+    if(_aSortMode==='desc-evo') return (y.evo==null?-999:y.evo)-(x.evo==null?-999:x.evo);
+    if(_aSortMode==='asc-evo')  return (x.evo==null?999:x.evo)-(y.evo==null?999:y.evo);
+    if(_aSortMode==='desc-cump')return (y.b==null?-1:y.b)-(x.b==null?-1:x.b);
+    if(_aSortMode==='asc-cump') return (x.b==null?9999:x.b)-(y.b==null?9999:y.b);
+    return 0;
+  });
+  var h='<table class="detail-table" style="width:100%"><thead><tr><th>Indicador</th><th>'+esc(aMonthLabel(keyA))+'</th><th>'+esc(aMonthLabel(keyB))+'</th><th>Evolución</th></tr></thead><tbody>';
+  out.forEach(function(r){
+    h+='<tr><td>'+esc(r.name)+'</td><td>'+(r.a==null?'N/D':r.a+'%')+'</td><td>'+(r.b==null?'N/D':r.b+'%')+'</td><td>'+aEvoBadge(r.evo)+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  g('aCompareTableWrap').innerHTML=h;
+}
+
+// ---- BLOQUE 4: Análisis por distrito ----
+function aDistrictBlock(){
+  var sD=aGetSel('aFDistrito');
+  var wrap=g('aDistrictWrap');
+  if(sD.length!==1){
+    wrap.innerHTML='<div class="no-data-state" style="padding:24px 20px"><p>Seleccioná un único <strong>Distrito</strong> en los filtros para ver el detalle de desempeño por programa.</p></div>';
+    return;
+  }
+  var months=aGetMonthList();
+  var pk=aGetPeriodKeys(months), keyA=pk.keyA, keyB=pk.keyB, idxA=pk.idxA, idxB=pk.idxB;
+  var rows=aScopeProgRows();
+  var snapGlobal=aSnapshot(rows,months);
+  var lastPct=snapGlobal[snapGlobal.length-1] ? snapGlobal[snapGlobal.length-1].pct : null;
+  var byProg={}; rows.forEach(function(r){ if(r.programa) (byProg[r.programa]=byProg[r.programa]||[]).push(r); });
+  var h='<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:14px;flex-wrap:wrap"><div style="font-size:1.3rem;font-weight:800">'+esc(sD[0])+'</div><div style="font-size:1.05rem;font-weight:700;color:#E97132">Formación Global: '+(lastPct==null?'N/D':lastPct+'%')+'</div></div>';
+  h+='<table class="detail-table" style="width:100%"><thead><tr><th>Programa</th><th>Cumplimiento</th><th>Evolución</th></tr></thead><tbody>';
+  Object.keys(byProg).sort(function(a,b){return a.localeCompare(b,'es');}).forEach(function(p){
+    var snap=aSnapshot(byProg[p],months);
+    var a=idxA>=0?snap[idxA].pct:null, b=idxB>=0?snap[idxB].pct:null;
+    var evo=(a!=null&&b!=null)?b-a:null;
+    h+='<tr><td>'+esc(p)+'</td><td>'+(b==null?'N/D':b+'%')+'</td><td>'+aEvoBadge(evo)+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  wrap.innerHTML=h;
+}
+
+// ---- BLOQUE 5: Ranking de distritos ----
+// NUEVO: este bloque compara distritos ENTRE SÍ, así que solo tiene sentido mientras no
+// haya un Distrito puntual ya seleccionado en los filtros principales (si ya elegiste un
+// distrito, no queda nada para "rankear" contra él mismo). Se oculta el bloque completo
+// (gráfico + tabla) en ese caso, y se muestra en cualquier otro (aunque haya País/Región
+// filtrado — comparar distritos DENTRO de un país filtrado sigue siendo útil). Además, para
+// mantener un único criterio de filtrado en todo el tab (pedido explícito del usuario), se
+// usa aScopeProgRows() en vez de una réplica manual del filtro de País/Región/Programa.
+function aRankingBlock(){
+  var sD=aGetSel('aFDistrito');
+  var chartBox=g('aRankChartBox'), tableBox=g('aRankTableBox');
+  if(sD.length>0){
+    if(chartBox) chartBox.style.display='none';
+    if(tableBox) tableBox.style.display='none';
+    Plotly.purge('aRankC');
+    return;
+  }
+  if(chartBox) chartBox.style.display='';
+  if(tableBox) tableBox.style.display='';
+  var months=aGetMonthList();
+  var pk=aGetPeriodKeys(months), keyA=pk.keyA, keyB=pk.keyB, idxA=pk.idxA, idxB=pk.idxB;
+  var rows=aScopeProgRows();
+  var byDist={}; rows.forEach(function(r){ if(r.distrito) (byDist[r.distrito]=byDist[r.distrito]||[]).push(r); });
+  var list=Object.keys(byDist).map(function(d){
+    var snap=aSnapshot(byDist[d],months);
+    var b=idxB>=0?snap[idxB].pct:null, a=idxA>=0?snap[idxA].pct:null;
+    return {distrito:d, pct:b, evo:(a!=null&&b!=null)?b-a:null};
+  });
+  list.sort(function(x,y){return (y.pct==null?-1:y.pct)-(x.pct==null?-1:x.pct);});
+  if(!list.length){ Plotly.purge('aRankC'); g('aRankTableWrap').innerHTML=''; return; }
+  g('aRankC').style.height=aH(list.length,220,30,560)+'px';
+  Plotly.newPlot('aRankC',[{
+    x:list.map(function(l){return l.pct==null?0:l.pct;}), y:list.map(function(l){return l.distrito;}),
+    type:'bar', orientation:'h', marker:{color:BASE.purple},
+    text:list.map(function(l){return l.pct==null?'N/D':l.pct+'%';}), textposition:'auto'
+  }],{
+    margin:{l:150,r:20,t:10,b:30}, font:{family:'Inter',size:11},
+    xaxis:{range:[0,100],ticksuffix:'%'}, yaxis:{automargin:true}
+  },{displayModeBar:false,responsive:true});
+  var h='<table class="detail-table" style="width:100%"><thead><tr><th>Distrito</th><th>Cumplimiento</th><th>Evolución</th></tr></thead><tbody>';
+  list.forEach(function(l){
+    h+='<tr><td>'+esc(l.distrito)+'</td><td>'+(l.pct==null?'N/D':l.pct+'%')+'</td><td>'+aEvoBadge(l.evo)+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  g('aRankTableWrap').innerHTML=h;
+}
+
+// ---- BLOQUE 6: Evolución por programa ----
+function aProgEvolTable(){
+  var months=aGetMonthList();
+  var rows=aScopeProgRows();
+  var byProg={}; rows.forEach(function(r){ if(r.programa) (byProg[r.programa]=byProg[r.programa]||[]).push(r); });
+  var names=Object.keys(byProg);
+  names.sort(function(a,b){return byProg[b].length-byProg[a].length;});
+  var capped = names.length>8;
+  if(capped) names=names.slice(0,8);
+  names.sort(function(a,b){return a.localeCompare(b,'es');});
+  var h='<table class="detail-table" style="width:100%"><thead><tr><th>Programa</th>'+months.map(function(m){return '<th>'+esc(aMonthLabel(m))+'</th>';}).join('')+'<th>Evolución</th></tr></thead><tbody>';
+  names.forEach(function(p){
+    var snap=aSnapshot(byProg[p],months);
+    var first=snap[0].pct, last=snap[snap.length-1].pct;
+    var evo=(first!=null&&last!=null)?last-first:null;
+    h+='<tr><td>'+esc(p)+'</td>'+snap.map(function(s){return '<td>'+(s.pct==null?'N/D':s.pct+'%')+'</td>';}).join('')+'<td style="font-weight:700">'+aEvoBadge(evo)+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  if(capped) h+='<div style="font-size:.72rem;color:#aaa;margin-top:8px">Mostrando los 8 programas con mayor volumen de asignados en el alcance filtrado. Usá el filtro Programa para ver otros.</div>';
+  g('aProgEvolWrap').innerHTML=h;
+}
+
+// ---- Orquestador ----
+var _at;
+function aDoFilter(){ clearTimeout(_at); _at=setTimeout(aRenderAll,120); }
+function aRenderAll(){
+  if(!aCheckData()) return;
+  aPopulate();
+  aFillPeriodSelectors();
+  aBadge();
+  aOverview();
+  aEvolChart();
+  aCompareTable();
+  aDistrictBlock();
+  aRankingBlock();
+  aProgEvolTable();
+}
+
+
 document.addEventListener('DOMContentLoaded',function(){
   // Cache version check — clear if outdated format
   var CACHE_VERSION = '3';
@@ -2794,9 +3312,11 @@ document.addEventListener('DOMContentLoaded',function(){
   // Tabs
   g('tabBtnProg').addEventListener('click',showTabProg);
   g('tabBtnCurs').addEventListener('click',showTabCurs);
+  var faBtn=g('tabBtnAnalytics');
+  if(faBtn)faBtn.addEventListener('click',showTabAnalytics);
   // Resize all Plotly charts when window resizes
   window.addEventListener('resize',function(){
-    ['pC1','pC2','pC3','pC4','cC1','cC2','cC3','cC4','infEvChart'].forEach(function(id){
+    ['pC1','pC2','pC3','pC4','cC1','cC2','cC3','cC4','infEvChart','aEvolC','aRankC'].forEach(function(id){
       var el=document.getElementById(id);
       if(el&&el.data)Plotly.Plots.resize(el);
     });
@@ -2807,7 +3327,6 @@ document.addEventListener('DOMContentLoaded',function(){
   g('btnLoadModal').addEventListener('click',applyUploads);
   setupUZ('uzProg','fiProg',true);
   setupUZ('uzCurs','fiCurs',false);
-  setupUZTalent('uzTalent','fiTalent');
   // Prog
   g('pBtnClear').addEventListener('click',pClear);
   g('pBtnMore').addEventListener('click',function(){var sf=g('pSecFilters');sf.classList.toggle('show');g('pMoreIcon').innerHTML=sf.classList.contains('show')?'&#9650;':'&#9660;';});
@@ -2826,6 +3345,22 @@ document.addEventListener('DOMContentLoaded',function(){
   // Recorrido tab wire
   var rBtn=g('tabBtnRecorrido');
   if(rBtn)rBtn.addEventListener('click',showTabRecorrido);
+  // Formacion Analytics tab wire (NUEVO)
+  var aBtnClear=g('aBtnClear');
+  if(aBtnClear)aBtnClear.addEventListener('click',aClear);
+  // NOTA: el selector interno "aEvolIndicator" se eliminó (ver js_analytics.js/aEvolScope) —
+  // el grafico de Evolucion mensual ya no tiene listener propio, sigue siempre el filtro de
+  // Programa/Curso de arriba a traves de aRenderAll()/aDoFilter().
+  // Periodo A/B ahora tambien re-renderiza Overview (antes solo afectaba Comparacion de
+  // periodos/Distrito/Ranking, por lo que el KPI principal quedaba fijo en "vs mes anterior"
+  // aunque se cambiara el selector — corregido junto con el fix de aOverview()).
+  var aPerA=g('aPeriodoA');
+  if(aPerA)aPerA.addEventListener('change',function(){aOverview();aCompareTable();aDistrictBlock();aRankingBlock();});
+  var aPerB=g('aPeriodoB');
+  if(aPerB)aPerB.addEventListener('change',function(){aOverview();aCompareTable();aDistrictBlock();aRankingBlock();});
+  document.querySelectorAll('.a-sort-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){ _aSortMode=btn.dataset.sort; aCompareTable(); });
+  });
 
   // Restore session on page refresh (F5) — keeps the user logged in instead of returning to login
   try{
@@ -3269,7 +3804,6 @@ var RM_SELECTED_LEGAJO=null;
 var RM_CONFIG_DRAFT=null;
 
 function rmLoad(){
-  // 1) Show local copy instantly (works offline / while the network fetch below runs)
   try{
     var raw=localStorage.getItem(ROADMAP_KEY);
     if(raw) ROADMAP_STAGES=JSON.parse(raw)||[];
@@ -3282,53 +3816,18 @@ function rmLoad(){
         {id:'e5',plazoLabel:'3 meses',dias:90,label:'Gestión comercial',items:[{tipo:'curso',nombre:''}]},
         {id:'e6',plazoLabel:'6 meses',dias:180,label:'CX Expert',items:[{tipo:'programa',nombre:''}]}
       ];
-      rmSaveLocal();
+      rmSave();
     }
   }catch(e){ ROADMAP_STAGES=[]; }
   try{
     ROADMAP_OVERALL_PROGRAM=localStorage.getItem(ROADMAP_OVERALL_KEY)||'';
   }catch(e){ ROADMAP_OVERALL_PROGRAM=''; }
-
-  // 2) Fetch the shared cloud copy — this is what makes every user (any browser,
-  // any country/training login) see the SAME configuration that global set up,
-  // instead of each browser only seeing what was configured locally on it.
-  var url=SB_URL+'/storage/v1/object/public/dashboard-files/roadmap_config.json?t='+Date.now();
-  var xhr=new XMLHttpRequest();
-  xhr.open('GET',url);
-  xhr.timeout=15000;
-  xhr.onload=function(){
-    if(xhr.status===200){
-      try{
-        var data=JSON.parse(xhr.responseText);
-        if(data && data.stages && data.stages.length){
-          ROADMAP_STAGES=data.stages;
-          ROADMAP_OVERALL_PROGRAM=data.overallProgram||'';
-          try{
-            localStorage.setItem(ROADMAP_KEY,JSON.stringify(ROADMAP_STAGES));
-            localStorage.setItem(ROADMAP_OVERALL_KEY,ROADMAP_OVERALL_PROGRAM);
-          }catch(e){}
-          if(RM_SELECTED_LEGAJO && typeof rmRenderTimeline==='function') rmRenderTimeline(RM_SELECTED_LEGAJO);
-        }
-      }catch(e){}
-    }
-    // If the cloud file doesn't exist yet (first-ever setup), we just keep the local/default copy.
-  };
-  xhr.send();
-}
-function rmSaveLocal(){
-  try{ localStorage.setItem(ROADMAP_KEY,JSON.stringify(ROADMAP_STAGES)); }catch(e){}
-}
-function rmSaveToCloud(cb){
-  var payload=JSON.stringify({stages:ROADMAP_STAGES, overallProgram:ROADMAP_OVERALL_PROGRAM||''});
-  uploadToStorage('roadmap_config.json', payload, function(ok){ if(cb) cb(ok); });
 }
 function rmSave(){
-  rmSaveLocal();
-  rmSaveToCloud(function(){});
+  try{ localStorage.setItem(ROADMAP_KEY,JSON.stringify(ROADMAP_STAGES)); }catch(e){}
 }
 function rmSaveOverallProgram(){
   try{ localStorage.setItem(ROADMAP_OVERALL_KEY,ROADMAP_OVERALL_PROGRAM||''); }catch(e){}
-  rmSaveToCloud(function(){});
 }
 function rmInit(){
   if(!ROADMAP_STAGES.length) rmLoad();
@@ -3492,25 +3991,6 @@ function rmRenderTimeline(legajo){
   g('rmPTienda').textContent=person.depto||'-';
   g('rmPIngreso').textContent=hireDate?hireDate.toLocaleDateString('es-AR'):'Sin dato';
   g('rmNoHireDateWarn').style.display=hireDate?'none':'block';
-
-  // Talent Match: cruce por legajo (ID SF) — siempre letra/emoji, nunca la palabra completa
-  var talentBadges=g('rmPTalentBadges');
-  var tmRow=TM.raw.filter(function(r){return r.legajo===legajo;})[0];
-  if(tmRow){
-    var pot=tmPotencialLabel(tmRow.potencial);
-    var cla=tmClasifBadge(tmRow.clasif);
-    var potBg = pot==='SI' ? '#EAF3DE' : (pot==='NO' ? '#FCEBEB' : '#eee');
-    var potFg = pot==='SI' ? '#3B6D11' : (pot==='NO' ? '#A32D2D' : '#888');
-    var html='<span style="background:'+potBg+';color:'+potFg+';padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700">Desarrollo: '+pot+'</span>';
-    if(cla.letter!=='-'){
-      html+='<span style="background:#f5f5f5;padding:2px 9px;border-radius:20px;font-size:.8rem;font-weight:700;color:#555">'+cla.emoji+' '+cla.letter+'</span>';
-    }
-    talentBadges.innerHTML=html;
-    talentBadges.style.display='flex';
-  }else{
-    talentBadges.innerHTML='';
-    talentBadges.style.display='none';
-  }
 
   var today=rmStartOfDay(new Date());
   var counts={ok:0,tarde:0,atrasado:0,pendiente:0};
@@ -3745,20 +4225,16 @@ function rmCfgAddItem(si){ RM_CONFIG_DRAFT[si].items.push({tipo:'programa',nombr
 function rmCfgRemoveItem(si,ii){ RM_CONFIG_DRAFT[si].items.splice(ii,1); rmRenderConfigModal(); }
 function rmSaveConfigModal(){
   ROADMAP_STAGES=RM_CONFIG_DRAFT;
-  rmSaveLocal();
+  rmSave();
   rmCloseConfigModal();
   if(RM_SELECTED_LEGAJO) rmRenderTimeline(RM_SELECTED_LEGAJO);
-  rmSaveToCloud(function(ok){
-    if(!ok) alert('El recorrido se guardó en este navegador, pero no se pudo sincronizar con la nube — otros usuarios podrían no ver estos cambios todavía. Probá guardar de nuevo con conexión estable.');
-  });
 }
 
-// ── Initialize Recorrido + Talent Match on enterDash ────────
+// ── Initialize Recorrido on enterDash ───────────────────────
 var _origEnterDash2=enterDash;
 enterDash=function(){
   _origEnterDash2();
   rmLoad();
-  tmLoad();
 };
 </script>
 </body>
