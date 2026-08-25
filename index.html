@@ -873,6 +873,17 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
       <!-- BLOQUE 4 — ANÁLISIS POR DISTRITO -->
       <div class="table-section" id="aDistrictWrap"></div>
 
+      <!-- BLOQUE 4b — EVOLUCIÓN POR DEPARTAMENTO (TIENDA) (solo con un Distrito puntual seleccionado — mismo gate que Bloque 4; se oculta si no, para no saturar de info cuando el alcance es más amplio) -->
+      <div class="chart-container" id="aDeptChartBox">
+        <div class="chart-title">Ranking de Departamentos (Tiendas) <span class="chart-subtitle" id="aDeptChartSubtitle"></span></div>
+        <div style="max-height:560px;overflow-y:auto" id="aDeptChartScroll"><div id="aDeptC"></div></div>
+        <div style="font-size:.68rem;color:#aaa;margin-top:6px">Ordenado de mayor a menor % de cumplimiento (Período B). Se muestran todas las tiendas del distrito — si son muchas, el bloque hace scroll interno.</div>
+      </div>
+      <div class="table-section" id="aDeptTableBox">
+        <div class="table-controls"><div style="font-weight:700;font-size:.9rem;color:#444">Evolución mensual por Departamento (Tienda)</div></div>
+        <div style="overflow-x:auto;max-height:480px;overflow-y:auto" id="aDeptTableWrap"></div>
+      </div>
+
       <!-- BLOQUE 5 — RANKING DE DISTRITOS (se oculta si hay un Distrito puntual seleccionado: no hay nada para comparar) -->
       <div class="chart-container" id="aRankChartBox"><div class="chart-title">Performance por Distrito <span class="chart-subtitle">según filtros activos</span></div><div id="aRankC" style="height:320px"></div></div>
       <div class="table-section" id="aRankTableBox"><div style="overflow-x:auto" id="aRankTableWrap"></div></div>
@@ -1252,8 +1263,37 @@ function applyMetaOnly(isProg, meta){
     var cEl2=g('dibCursCountry'); if(cEl2) cEl2.style.display=isGlobal?'none':'';
   }
 }
+// NUEVO: alcance fijo del dashboard (pedido explicito del usuario, 20-ago) — antes tenia
+// que filtrar y borrar filas a mano en el Excel antes de cada carga porque el archivo de
+// origen trae mas paises/segmentos de los que este dashboard debe mostrar. Se aplica SIEMPRE
+// (Programas y Cursos, cualquier usuario, incluido "global"), ademas del filtro de permisos
+// por pais (CF) que ya existia — asi la carga del archivo tal cual viene del reporte nunca
+// vuelve a requerir edicion manual previa.
+// FIX (24-ago): "MEXICO" es el unico de los 4 paises permitidos que en el Excel puede venir
+// con tilde ("México") — Argentina/Chile/Peru no tienen ninguna letra acentuada, por lo que el
+// problema pasaba desapercibido para esos paises. La comparacion original solo hacia
+// toUpperCase() (sin quitar tildes), asi que "México" nunca matcheaba contra "MEXICO" en
+// ALLOWED_PAISES y esas filas quedaban excluidas en silencio — reportado puntualmente en
+// Cursos (donde el formato del export es mas inconsistente), pero el mismo problema podia
+// afectar tambien al filtro de permisos por pais (CF) para el login "mexico"/"training.mx".
+// normUpper() quita tildes/diacriticos ademas de mayusculizar, igual que ya hace nH() para
+// headers, pero sin colapsar espacios (para no mezclar segmentos distintos por accidente).
+function normUpper(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase(); }
+var ALLOWED_PAISES = ['ARGENTINA','MEXICO','CHILE','PERU'];
+var ALLOWED_SEGMENTOS = ['STAFF RETAIL','TIENDA ATELIER','TIENDA TMB','TIENDA TODOMODA','TIENDA ISADORA'];
+var ALLOWED_PAISES_N = ALLOWED_PAISES.map(normUpper);
+var ALLOWED_SEGMENTOS_N = ALLOWED_SEGMENTOS.map(normUpper);
+function passesAllowedScope(r){
+  var pais = normUpper(r.pais);
+  var seg  = normUpper(r.segmento);
+  return ALLOWED_PAISES_N.indexOf(pais)>=0 && ALLOWED_SEGMENTOS_N.indexOf(seg)>=0;
+}
 function applyData(isProg, rows, meta){
-  var filtered = CF ? rows.filter(function(r){return CF.indexOf(r.pais)>=0;}) : rows;
+  var filtered = CF ? rows.filter(function(r){
+    var pn=normUpper(r.pais);
+    return CF.some(function(c){return normUpper(c)===pn;});
+  }) : rows;
+  filtered = filtered.filter(passesAllowedScope);
   if(isProg){
     P.raw = filtered;
     if(!pHasFilters()){P.fSel={};P.cfg.forEach(function(f){P.fSel[f.id]={};});}
@@ -1541,26 +1581,34 @@ function mapProgRow(headers,row){
 }
 function mapCursRow(headers,row){
   var map={};for(var i=0;i<headers.length;i++)map[nH(headers[i])]=row[i]!==undefined&&row[i]!==null?String(row[i]):'';
-  var _rawEstadoC=gV(map,['Estatus de finalizacion','Estatus de finalizaci\u00f3n']);
-  var fFin=parseDate(gV(map,['La fecha de finalizacion','Fecha de finalizacion']));
+  // NUEVO: el usuario confirmo (20-ago) que el export de Cursos puede venir con una mezcla
+  // de columnas en espanol e ingles dentro de la MISMA fila de headers (ej. "Course Name",
+  // "User ID Number", "Completion Status", "The completion date", "Progress", "Course
+  // Category" en vez de sus equivalentes en espanol) \u2014 mientras que "Unidad de negocio
+  // (Label)" y "Tipo de segmento" siempre vienen en espanol (confirmado con un header real).
+  // Antes, varios campos NO tenian alias en ingles: quedaban vacios para TODAS las filas de
+  // ese archivo sin ningun error visible (curso, legajo, posicion, estado, progreso,
+  // fechaFin, categoria, calificacion) \u2014 causa real de "a veces tira errores" al subir.
+  var _rawEstadoC=gV(map,['Estatus de finalizacion','Estatus de finalizaci\u00f3n','Completion Status']);
+  var fFin=parseDate(gV(map,['La fecha de finalizacion','Fecha de finalizacion','The completion date']));
   var _fechaFinDateC=rapFallbackDate(_rawEstadoC,fFin.date);
   return{
-    curso:      gV(map,['Nombre del Curso','Nombre del curso']),
-    legajo:     gV(map,['Numero de ID del usuario','N\u00famero de ID del usuario','Legajo']),
+    curso:      gV(map,['Nombre del Curso','Nombre del curso','Course Name']),
+    legajo:     gV(map,['Numero de ID del usuario','N\u00famero de ID del usuario','Legajo','User ID Number']),
     pais:       gV(map,['Unidad de negocio (Label)']),
     segmento:   gV(map,['Tipo de segmento']),
     depto:      gV(map,['Departamento (Label)']),
     nombre:     gV(map,['Nombre completo del usuario',"User's Fullname",'Fullname']),
-    posicion:   gV(map,['Nombre de la Posicion al finalizar','Nombre de la Posici\u00f3n al finalizar']),
+    posicion:   gV(map,['Nombre de la Posicion al finalizar','Nombre de la Posici\u00f3n al finalizar','Completion Position Name']),
     estado:     normSt(_rawEstadoC),
-    progreso:   parseProgreso(gV(map,['Progreso'])),
+    progreso:   parseProgreso(gV(map,['Progreso','Progress'])),
     fechaFin:   fFin.txt||(_fechaFinDateC&&_fechaFinDateC!==fFin.date?'01/11/2026 (RAP, estimado)':''),
     fechaFinDate: _fechaFinDateC,
     fechaContrDate: parseDate(gV(map,['Fecha de contratacion','Fecha de contrataci\u00f3n'])).date,
     distrito:   gV(map,['Distrito']),
     region:     gV(map,['Region','Regi\u00f3n']),
-    calificacion: gV(map,['Calificacion','Calificaci\u00f3n']),
-    categoria:  gV(map,['Categoria del Curso','Categor\u00eda del Curso'])
+    calificacion: gV(map,['Calificacion','Calificaci\u00f3n','Grade']),
+    categoria:  gV(map,['Categoria del Curso','Categor\u00eda del Curso','Course Category'])
   };
 }
 
@@ -2971,6 +3019,21 @@ function aSnapshot(rows, months){
   });
 }
 function aPP(b,a){ if(a==null||b==null) return null; return b-a; }
+// FIX (24-ago): la columna "Evolución" de las matrices mensuales (Evolución por programa,
+// Evolución por Departamento/Tienda) comparaba el primer mes DE LA VENTANA (Enero 2026) contra
+// el último — si una tienda/programa no tenía datos ese primer mes (N/D, porque todavía no
+// existía o no tenía nadie asignado), el cálculo quedaba en null y se mostraba "—", aunque
+// hubiera crecido de manera real desde el mes en que sí empezó a tener datos. Ahora se toma el
+// primer y el último mes CON DATOS REALES (no null), sin importar en qué mes de la ventana
+// caigan — así una tienda que recién tiene datos desde Mayo sí muestra su evolución Mayo→Ago.
+// Solo queda en "—" si tiene 0 o 1 mes con datos (no hay nada para comparar).
+function aFirstLastEvo(snap){
+  var firstIdx=-1, lastIdx=-1;
+  for(var i=0;i<snap.length;i++){
+    if(snap[i].pct!=null){ if(firstIdx<0) firstIdx=i; lastIdx=i; }
+  }
+  return (firstIdx>=0 && lastIdx>firstIdx) ? (snap[lastIdx].pct - snap[firstIdx].pct) : null;
+}
 function aEvoBadge(evo){
   if(evo==null) return '<span class="bench-neutral">—</span>';
   if(evo>0) return '<span class="bench-up">&#9650; +'+evo+' pp</span>';
@@ -3209,6 +3272,65 @@ function aDistrictBlock(){
   wrap.innerHTML=h;
 }
 
+// ---- BLOQUE 4b: Evolución por Departamento (Tienda) ----
+// NUEVO (24-ago): pedido explícito del usuario — ver cómo fue creciendo cada Departamento
+// (tienda) dentro del Distrito seleccionado. Mismo gate que Bloque 4 (aDistrictBlock): solo
+// tiene sentido con un único Distrito filtrado, porque a nivel Distrito/País ya es "mucha
+// info" según el propio usuario. Se oculta el bloque completo (gráfico + tabla) si no hay
+// exactamente un Distrito seleccionado, igual que aRankingBlock() hace en el caso inverso.
+// Muestra TODAS las tiendas del distrito (sin recorte top-N): el contenedor crece de alto y
+// hace scroll interno si hace falta (decisión explícita del usuario, ver aDeptChartScroll en
+// el HTML) — a diferencia de aProgEvolTable() que sí recorta a 8 programas.
+function aDeptBlock(){
+  var sD=aGetSel('aFDistrito');
+  var chartBox=g('aDeptChartBox'), tableBox=g('aDeptTableBox');
+  if(sD.length!==1){
+    if(chartBox) chartBox.style.display='none';
+    if(tableBox) tableBox.style.display='none';
+    Plotly.purge('aDeptC');
+    return;
+  }
+  if(chartBox) chartBox.style.display='';
+  if(tableBox) tableBox.style.display='';
+  var months=aGetMonthList();
+  var pk=aGetPeriodKeys(months), idxA=pk.idxA, idxB=pk.idxB;
+  var rows=aScopeProgRows();
+  var byDept={}; rows.forEach(function(r){ if(r.depto) (byDept[r.depto]=byDept[r.depto]||[]).push(r); });
+  var names=Object.keys(byDept);
+  var subEl=g('aDeptChartSubtitle'); if(subEl) subEl.textContent=sD[0];
+  if(!names.length){
+    Plotly.purge('aDeptC');
+    g('aDeptTableWrap').innerHTML='<div class="no-data-state" style="padding:20px"><p>No hay datos de Departamento (tienda) cargados para este distrito.</p></div>';
+    return;
+  }
+  // Ranking ordenado por mayor cumplimiento primero (Período B) — pedido explícito del usuario.
+  var list=names.map(function(d){
+    var snap=aSnapshot(byDept[d],months);
+    var b=idxB>=0?snap[idxB].pct:null, a=idxA>=0?snap[idxA].pct:null;
+    return {depto:d, pct:b, evo:(a!=null&&b!=null)?b-a:null, snap:snap};
+  });
+  list.sort(function(x,y){return (y.pct==null?-1:y.pct)-(x.pct==null?-1:x.pct);});
+  g('aDeptC').style.height=Math.max(220,list.length*26+50)+'px';
+  Plotly.newPlot('aDeptC',[{
+    x:list.map(function(l){return l.pct==null?0:l.pct;}), y:list.map(function(l){return l.depto;}),
+    type:'bar', orientation:'h', marker:{color:BASE.orange},
+    text:list.map(function(l){return l.pct==null?'N/D':l.pct+'%';}), textposition:'auto'
+  }],{
+    margin:{l:190,r:40,t:10,b:30}, xaxis:{title:'% Cumplimiento (Período B)',range:[0,100]},
+    yaxis:{autorange:'reversed'}, font:{size:11}
+  },{displayModeBar:false,responsive:true});
+
+  // Matriz mensual — misma estructura que "Evolución por programa" (Bloque 6), sin cap de filas
+  // (a diferencia de aProgEvolTable, que recorta a los 8 de mayor volumen).
+  var th='<table class="detail-table" style="width:100%"><thead><tr><th>Departamento (Tienda)</th>'+months.map(function(m){return '<th>'+esc(aMonthLabel(m))+'</th>';}).join('')+'<th>Evolución</th></tr></thead><tbody>';
+  list.forEach(function(l){
+    var evoTotal=aFirstLastEvo(l.snap);
+    th+='<tr><td>'+esc(l.depto)+'</td>'+l.snap.map(function(s){return '<td>'+(s.pct==null?'N/D':s.pct+'%')+'</td>';}).join('')+'<td style="font-weight:700">'+aEvoBadge(evoTotal)+'</td></tr>';
+  });
+  th+='</tbody></table>';
+  g('aDeptTableWrap').innerHTML=th;
+}
+
 // ---- BLOQUE 5: Ranking de distritos ----
 // NUEVO: este bloque compara distritos ENTRE SÍ, así que solo tiene sentido mientras no
 // haya un Distrito puntual ya seleccionado en los filtros principales (si ya elegiste un
@@ -3269,8 +3391,7 @@ function aProgEvolTable(){
   var h='<table class="detail-table" style="width:100%"><thead><tr><th>Programa</th>'+months.map(function(m){return '<th>'+esc(aMonthLabel(m))+'</th>';}).join('')+'<th>Evolución</th></tr></thead><tbody>';
   names.forEach(function(p){
     var snap=aSnapshot(byProg[p],months);
-    var first=snap[0].pct, last=snap[snap.length-1].pct;
-    var evo=(first!=null&&last!=null)?last-first:null;
+    var evo=aFirstLastEvo(snap);
     h+='<tr><td>'+esc(p)+'</td>'+snap.map(function(s){return '<td>'+(s.pct==null?'N/D':s.pct+'%')+'</td>';}).join('')+'<td style="font-weight:700">'+aEvoBadge(evo)+'</td></tr>';
   });
   h+='</tbody></table>';
@@ -3290,6 +3411,7 @@ function aRenderAll(){
   aEvolChart();
   aCompareTable();
   aDistrictBlock();
+  aDeptBlock();
   aRankingBlock();
   aProgEvolTable();
 }
@@ -3355,9 +3477,9 @@ document.addEventListener('DOMContentLoaded',function(){
   // periodos/Distrito/Ranking, por lo que el KPI principal quedaba fijo en "vs mes anterior"
   // aunque se cambiara el selector — corregido junto con el fix de aOverview()).
   var aPerA=g('aPeriodoA');
-  if(aPerA)aPerA.addEventListener('change',function(){aOverview();aCompareTable();aDistrictBlock();aRankingBlock();});
+  if(aPerA)aPerA.addEventListener('change',function(){aOverview();aCompareTable();aDistrictBlock();aDeptBlock();aRankingBlock();});
   var aPerB=g('aPeriodoB');
-  if(aPerB)aPerB.addEventListener('change',function(){aOverview();aCompareTable();aDistrictBlock();aRankingBlock();});
+  if(aPerB)aPerB.addEventListener('change',function(){aOverview();aCompareTable();aDistrictBlock();aDeptBlock();aRankingBlock();});
   document.querySelectorAll('.a-sort-btn').forEach(function(btn){
     btn.addEventListener('click',function(){ _aSortMode=btn.dataset.sort; aCompareTable(); });
   });
