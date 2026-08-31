@@ -1399,6 +1399,21 @@ function parseDate(v){
     var dt1=new Date(y1,mo1-1,d1);
     return{txt:String(d1).padStart(2,'0')+'/'+String(mo1).padStart(2,'0')+'/'+y1,date:dt1};
   }
+  // dd/mm/aa o dd-mm-aa (año de 2 digitos) — NUEVO (24-ago): "Fecha de contratacion" empezo a
+  // migrar con este formato desde la plataforma de origen (antes era siempre dd/mm/aaaa), y sin
+  // este bloque esas fechas no matcheaban el patron anterior (exige año de 4 digitos) y quedaban
+  // con date:null — la persona no desaparecia de la carga, pero cualquier calculo que dependa de
+  // fechaContrDate (antiguedad, filtros por fecha de ingreso, etc.) la excluia en silencio. Se
+  // aplica el mismo criterio de siglo que usa Excel y la mayoria de plataformas de RRHH para año
+  // de 2 digitos: 00-49 -> 20xx, 50-99 -> 19xx. El (?!\d) evita que esto interfiera con fechas de
+  // 4 digitos que por algun motivo no matchearon arriba (ya vendrian con 3+ digitos despues).
+  var m1b=t.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})(?!\d)/);
+  if(m1b){
+    var d1b=parseInt(m1b[1],10),mo1b=parseInt(m1b[2],10),yy1b=parseInt(m1b[3],10);
+    var y1b = yy1b<=49 ? 2000+yy1b : 1900+yy1b;
+    var dt1b=new Date(y1b,mo1b-1,d1b);
+    return{txt:String(d1b).padStart(2,'0')+'/'+String(mo1b).padStart(2,'0')+'/'+y1b,date:dt1b};
+  }
   // yyyy-mm-dd o yyyy/mm/dd (ISO) — NUEVO: algunos exports (sobre todo CSV) usan este formato
   // y antes quedaban sin fecha (date:null) porque no matcheaban el patron anterior.
   var m2=t.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
