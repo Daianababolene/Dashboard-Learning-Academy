@@ -398,6 +398,7 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
     </div>
     <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
       <span class="user-badge" id="userBadge">Global</span>
+      <button class="btn-sm" id="btnScopeBypass" style="display:none;background:#FDE8DB;color:#A45F2B;border:1px solid #F2C1A0" title="Muestra TODOS los paises/segmentos del archivo, sin el filtro fijo (solo para diagnostico)">Ver sin alcance fijo</button>
       <button class="btn-sm" id="btnManageData" style="display:none">Gestionar datos</button>
       <button class="btn-logout" id="btnLogout">Cerrar sesion</button>
     </div>
@@ -1288,12 +1289,17 @@ function passesAllowedScope(r){
   var seg  = normUpper(r.segmento);
   return ALLOWED_PAISES_N.indexOf(pais)>=0 && ALLOWED_SEGMENTOS_N.indexOf(seg)>=0;
 }
-function applyData(isProg, rows, meta){
-  var filtered = CF ? rows.filter(function(r){
-    var pn=normUpper(r.pais);
-    return CF.some(function(c){return normUpper(c)===pn;});
-  }) : rows;
-  filtered = filtered.filter(passesAllowedScope);
+// NUEVO (01-sep): boton de diagnostico "Ver sin alcance fijo", solo visible para el usuario
+// Global — el usuario reporto que 243 personas de agosto (sin errores de tipeo, dentro de lo
+// que el dashboard SI deberia mostrar) aparecian como 40. Para diagnosticar esto sin tener que
+// pedir el Excel original cada vez, se guardan las filas YA filtradas por permiso de pais (CF)
+// pero SIN el alcance fijo de paises/segmentos (Correccion 11) en P._unscoped/C._unscoped, y
+// SCOPE_BYPASS permite alternar entre verlas con o sin ese filtro sin volver a cargar el
+// archivo. applyScopeAndFinish() concentra la logica que antes vivia directamente en
+// applyData(), para que tanto la carga inicial como el toggle usen exactamente el mismo camino.
+var SCOPE_BYPASS=false;
+function applyScopeAndFinish(isProg, afterCF, meta){
+  var filtered = SCOPE_BYPASS ? afterCF : afterCF.filter(passesAllowedScope);
   if(isProg){
     P.raw = filtered;
     if(!pHasFilters()){P.fSel={};P.cfg.forEach(function(f){P.fSel[f.id]={};});}
@@ -1334,6 +1340,31 @@ function applyData(isProg, rows, meta){
     var mwEl2=g('dcMismatchWarn'), mcEl2=g('dcMismatchCount');
     if(mwEl2){ mwEl2.style.display=(isGlobal2&&C_MISMATCHES.length)?'inline':'none'; if(mcEl2)mcEl2.textContent=C_MISMATCHES.length; }
   }
+}
+function applyData(isProg, rows, meta){
+  var afterCF = CF ? rows.filter(function(r){
+    var pn=normUpper(r.pais);
+    return CF.some(function(c){return normUpper(c)===pn;});
+  }) : rows;
+  if(isProg){ P._unscoped=afterCF; P._lastMeta=meta; }
+  else { C._unscoped=afterCF; C._lastMeta=meta; }
+  applyScopeAndFinish(isProg, afterCF, meta);
+}
+// Alterna SCOPE_BYPASS y vuelve a aplicar (o no) el alcance fijo sobre los datos ya cargados,
+// sin necesidad de re-subir el archivo. Solo tiene sentido si ya hay datos cargados.
+function toggleScopeBypass(){
+  SCOPE_BYPASS=!SCOPE_BYPASS;
+  var btn=g('btnScopeBypass');
+  if(btn){
+    btn.textContent = SCOPE_BYPASS?'Volver al alcance fijo':'Ver sin alcance fijo';
+    btn.style.background = SCOPE_BYPASS?'#FDEAEA':'#FDE8DB';
+    btn.style.color = SCOPE_BYPASS?'#B33A3A':'#A45F2B';
+    btn.style.borderColor = SCOPE_BYPASS?'#F0B8B8':'#F2C1A0';
+  }
+  if(P._unscoped) applyScopeAndFinish(true, P._unscoped, P._lastMeta||{});
+  if(C._unscoped) applyScopeAndFinish(false, C._unscoped, C._lastMeta||{});
+  refreshTabProg();
+  refreshTabCurs();
 }
 
 function lsCacheLoad(isProg){
@@ -1645,7 +1676,7 @@ function doLogin(){
 function doLogout(){
   // Clear in-memory state only — localStorage data cache persists for next login
   P=makeState(P.cfg);C=makeState(C.cfg);
-  pendProg=null;pendCurs=null;CF=null;CU=null;
+  pendProg=null;pendCurs=null;CF=null;CU=null;SCOPE_BYPASS=false;
   try{localStorage.removeItem('xtc_session_user');}catch(e){}
   g('dashboardScreen').style.display='none';
   g('loginScreen').style.display='flex';
@@ -1678,6 +1709,7 @@ function enterDash(){
   ['dibProgGlobal','dibCursGlobal'].forEach(function(id){var el=g(id);if(el)el.style.display=isGlobal?'':'none';});
   ['dibProgCountry','dibCursCountry'].forEach(function(id){var el=g(id);if(el)el.style.display=isGlobal?'none':'';});
   g('btnManageData').style.display=CU==='global'?'inline-block':'none';
+  g('btnScopeBypass').style.display=CU==='global'?'inline-block':'none';
   initAllMS();
   restoreData(true, function(){
     refreshTabProg();
@@ -2178,10 +2210,30 @@ function setOpts(state,id,values,keep,triggerFn){
 // PROGRAMAS — FILTER LOGIC
 // ============================================================
 function pGetSel(id){return Object.keys(P.fSel[id]||{});}
+// FIX (01-sep): "al seleccionar una fecha determinada no aparecen registros" — un <input
+// type="date"> siempre entrega su valor como texto "yyyy-mm-dd", y `new Date('2026-08-08')`
+// (con SOLO fecha, sin hora) lo interpreta el motor de JS como medianoche en UTC, no en la
+// hora local. En cambio, `row.fechaContrDate` se construye con `new Date(y,mo-1,d)` (parseDate),
+// que SIEMPRE es medianoche en hora LOCAL. Con Argentina en UTC-3 (y cualquier huso horario
+// "detras" de UTC), esas 3 horas de diferencia hacen que una fecha de contratacion real del
+// mismo dia del limite del rango quede excluida por unas horas de nada — reproducido y
+// confirmado: filtrar exactamente "01/08 a 01/08" para un registro contratado el 1/08 daba 0
+// resultados. dateInputToLocal() arma la fecha en hora LOCAL a partir del string del input
+// (igual que ya hace parseDate() con las fechas del Excel), y ademas "Hasta" se lleva al final
+// del dia (23:59:59.999) para que incluya el dia completo, no solo su primer instante.
+function dateInputToLocal(v, endOfDay){
+  if(!v) return null;
+  var parts=v.split('-');
+  if(parts.length!==3) return null;
+  var y=parseInt(parts[0],10), mo=parseInt(parts[1],10), d=parseInt(parts[2],10);
+  if(!y||!mo||!d) return null;
+  return endOfDay ? new Date(y,mo-1,d,23,59,59,999) : new Date(y,mo-1,d,0,0,0,0);
+}
 function pMatch(row,skip){
   function chk(id,fn){if(id===skip)return true;var s=pGetSel(id);return !s.length||fn(s);}
   var fd=g('pFDesde'),fh=g('pFHasta');
-  var fdD=fd&&fd.value?new Date(fd.value):null,fhD=fh&&fh.value?new Date(fh.value):null;
+  var fdD=fd&&fd.value?dateInputToLocal(fd.value,false):null;
+  var fhD=fh&&fh.value?dateInputToLocal(fh.value,true):null;
   // Date filter: if filter active and row has no date, EXCLUDE the row
   if(fdD){if(!row.fechaContrDate||row.fechaContrDate<fdD)return false;}
   if(fhD){if(!row.fechaContrDate||row.fechaContrDate>fhD)return false;}
@@ -2396,8 +2448,26 @@ function pBench(){
     g('pBCBL').textContent='Completitud '+sP[0]; g('pBCBV').textContent=ck.cPct+'%'; bCB.style.display='block';
   }else bCB.style.display='none';
 }
+// FIX (31-ago): "no muestra detalle abajo" — el reporte del usuario tenia una causa real, no
+// era la tabla la que estaba rota. pC4() (mapa de calor) podia lanzar una excepcion NO
+// capturada de Plotly ("Something went wrong with axis scaling") en un caso de borde muy
+// realista: filtrar hasta dejar exactamente 1 programa x 1 categoria en el eje X, sin ninguna
+// celda en 0% (la capa gris de "0%" quedaba con TODOS sus valores null, y Plotly no puede
+// calcular el rango de un heatmap 1x1 completamente null). Como pTable() se llama justo
+// despues de pCharts() dentro de _pFilter(), esa excepcion cortaba la ejecucion ahi mismo y la
+// tabla de detalle nunca llegaba a dibujarse — pese a que el KPI de arriba si se actualizaba
+// bien (se calcula ANTES de pCharts()). Este mismo "Something went wrong with axis scaling"
+// aparecia hace tiempo en varios tests de este dashboard y se habia asumido como un warning
+// cosmetico de Plotly sin impacto real — en base a este hallazgo, no lo es: puede cortar en
+// seco el resto del render. Doble fix: (1) se quita en pC4() la causa raiz (ver abajo), y (2)
+// se aisla cada grafico con try/catch aca, para que si CUALQUIERA de los 4 falla por un motivo
+// no previsto, los demas graficos y sobre todo pTable() (que ya no depende de pCharts en el
+// orden de ejecucion) sigan funcionando igual.
 function pCharts(){
-  pC1();pC2();pC3();pC4();
+  [pC1,pC2,pC3,pC4].forEach(function(fn){
+    try{ fn(); }
+    catch(e){ console.error('pCharts: fallo '+fn.name+' — se omite ese grafico sin afectar al resto', e); }
+  });
   // Force Plotly to recalculate widths after render
   setTimeout(function(){
     ['pC1','pC2','pC3','pC4'].forEach(function(id){
@@ -2492,6 +2562,35 @@ function pC4(){
   if(!pArr.length||!xRaw.length){
     Plotly.purge('pC4');
     g('pC4').innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;font-size:.85rem;text-align:center;padding:20px">Sin datos suficientes para mostrar el mapa de calor.<br>Aplica filtros para reducir la selección.</div>';
+    return;
+  }
+  // FIX (31-ago): con exactamente 1 programa en el eje Y, Plotly.js tira una excepcion interna
+  // ("Something went wrong with axis scaling") al intentar calcular el rango de un heatmap de
+  // una sola fila — probado y confirmado con casos reales: 1 fila x N columnas siempre falla,
+  // 2+ filas nunca falla, sin importar cuantas columnas haya. Es un caso MUY realista (cualquier
+  // usuario que filtre por un unico Programa cae aca) y antes de este fix esa excepcion cortaba
+  // en seco el resto del render (ver el blindaje con try/catch en pCharts(), que ya evita que
+  // esto rompa la tabla de detalle, pero el mapa de calor se veia vacio sin explicacion). En vez
+  // de forzar a Plotly a dibujar un heatmap degenerado de 1 fila, se muestra una fila de badges
+  // con el mismo dato (% de completitud por categoria del eje X) — mas simple y ademas evita el
+  // bug de raiz en vez de solo contenerlo.
+  if(pArr.length===1){
+    Plotly.purge('pC4');
+    var soloProg=pArr[0];
+    var badgeItems=xRaw.map(function(x){
+      var sub2=P.filt.filter(function(r){return r.programa===soloProg&&r[xF]===x;});
+      var pct=sub2.length?Math.round(sub2.filter(function(r){return r.estado==='Completado';}).length/sub2.length*100):null;
+      return {x:x,pct:pct};
+    }).sort(function(a,b){return (b.pct==null?-1:b.pct)-(a.pct==null?-1:a.pct);});
+    g('pC4').style.height='';
+    var bh='<div style="padding:10px 4px 6px"><div style="font-size:.8rem;font-weight:700;color:#444;margin-bottom:10px">'+esc(soloProg)+'</div><div style="display:flex;flex-wrap:wrap;gap:8px">';
+    badgeItems.forEach(function(it){
+      var bg=it.pct==null?'#EBEBEB':it.pct>=70?'#AE90C3':it.pct>=40?'#F5A874':'#E97132';
+      var fg=it.pct==null?'#999':'#fff';
+      bh+='<div style="background:'+bg+';color:'+fg+';border-radius:8px;padding:8px 12px;font-size:.78rem;min-width:110px" title="'+esc(it.x)+'"><div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">'+esc(trunc(it.x,22))+'</div><div style="font-size:.95rem;font-weight:800;margin-top:2px">'+(it.pct==null?'N/D':it.pct+'%')+'</div></div>';
+    });
+    bh+='</div></div>';
+    g('pC4').innerHTML=bh;
     return;
   }
   // Limit cells: more generous when 1 program selected, auto-reduce X axis before blocking
@@ -2604,9 +2703,17 @@ function pC4(){
       showscale:true,
       colorbar:{title:'%',thickness:14,len:0.8},
       xgap:3,ygap:3
-    },
-    // Gray trace for 0% cells
-    {
+    }
+  ];
+  // FIX (31-ago): la capa gris de "0%" solo se agrega si REALMENTE hay al menos una celda en
+  // 0% — antes se agregaba siempre, y un heatmap con un unico programa x una unica categoria
+  // (caso de borde muy realista al filtrar bastante) mas un z totalmente null hacia que Plotly
+  // tirara una excepcion ("Something went wrong with axis scaling") que cortaba el resto del
+  // render (ver el fix en pCharts() mas arriba, que ademas blinda esto para cualquier otro
+  // caso de borde no previsto).
+  var hasZero = zZero.some(function(row){return row.some(function(v){return v===0;});});
+  if(hasZero){
+    traces.push({
       type:'heatmap',z:zZero,
       x:xArr.map(function(v){return trunc(v,22);}),
       y:pArr.map(function(v){return trunc(v,35);}),
@@ -2615,8 +2722,8 @@ function pC4(){
       showscale:false,
       hovertemplate:'<b>%{y}</b><br>%{x}<br>Sin completitud (0%)<extra></extra>',
       xgap:3,ygap:3
-    }
-  ];
+    });
+  }
 
   Plotly.newPlot('pC4',traces,{
     margin:{t:20,b:bMargin,l:lMargin,r:80},
@@ -2798,8 +2905,16 @@ function cC4(){
   Plotly.newPlot('cC4',[{type:'heatmap',z:z,x:xArr.map(function(v){return trunc(v,20);}),y:cArr.map(function(v){return trunc(v,32);}),colorscale:[[0,blend(BASE.orange,'#ffffff',0.35)],[0.5,BASE.yellow],[1,BASE.purple]],hovertemplate:'<b>%{y}</b><br>%{x}<br>%{z}%<extra></extra>',showscale:true,colorbar:{title:'%',thickness:14},xgap:2,ygap:2}],
     {margin:{t:20,b:85,l:Math.min(320,Math.max(130,mx*7)),r:65},annotations:ann,font:{family:'Inter',size:10},plot_bgcolor:'#fff',paper_bgcolor:'#fff',xaxis:{tickangle:xArr.length>5?-35:-10,automargin:true},yaxis:{autorange:'reversed',automargin:true}},{responsive:true,displayModeBar:false});
 }
+// FIX (31-ago): mismo blindaje que pCharts() — cTable() se llama justo despues de cCharts()
+// dentro del flujo de filtrado de Cursos, asi que una excepcion no capturada en cualquiera de
+// los 4 graficos (por ejemplo un caso de borde de Plotly no previsto, como el que sí se
+// encontró y corrigió en pC4() para Programas) podria cortar la tabla de detalle de Cursos de
+// la misma forma. Se aisla cada grafico para que ninguno pueda tumbar a los demas ni a la tabla.
 function cCharts(){
-  cC1();cC2();cC3();cC4();
+  [cC1,cC2,cC3,cC4].forEach(function(fn){
+    try{ fn(); }
+    catch(e){ console.error('cCharts: fallo '+fn.name+' — se omite ese grafico sin afectar al resto', e); }
+  });
   setTimeout(function(){
     ['cC1','cC2','cC3','cC4'].forEach(function(id){
       var el=document.getElementById(id);
@@ -3417,18 +3532,22 @@ function aProgEvolTable(){
 // ---- Orquestador ----
 var _at;
 function aDoFilter(){ clearTimeout(_at); _at=setTimeout(aRenderAll,120); }
+// FIX (31-ago): mismo problema encontrado y corregido en Programas/Cursos (ver pCharts() y
+// cCharts() en dashboard.html) — una excepcion no capturada en cualquiera de estos bloques
+// (varios usan Plotly.newPlot, y ya se confirmo un caso real donde un grafico con una unica
+// categoria puede hacer que Plotly tire "Something went wrong with axis scaling") cortaba la
+// ejecucion ahi mismo y todos los bloques siguientes de la lista (incluida la tabla "Evolucion
+// por programa", la ultima) se quedaban sin renderizar — sin ningun aviso visible. Se aisla
+// cada bloque para que ninguno pueda tumbar a los que le siguen.
 function aRenderAll(){
   if(!aCheckData()) return;
   aPopulate();
   aFillPeriodSelectors();
   aBadge();
-  aOverview();
-  aEvolChart();
-  aCompareTable();
-  aDistrictBlock();
-  aDeptBlock();
-  aRankingBlock();
-  aProgEvolTable();
+  [aOverview,aEvolChart,aCompareTable,aDistrictBlock,aDeptBlock,aRankingBlock,aProgEvolTable].forEach(function(fn){
+    try{ fn(); }
+    catch(e){ console.error('aRenderAll: fallo '+fn.name+' — se omite ese bloque sin afectar al resto', e); }
+  });
 }
 
 
@@ -3460,6 +3579,7 @@ document.addEventListener('DOMContentLoaded',function(){
   });
   // Modal
   g('btnManageData').addEventListener('click',openModal);
+  g('btnScopeBypass').addEventListener('click',toggleScopeBypass);
   g('btnCloseModal').addEventListener('click',closeModal);
   g('btnLoadModal').addEventListener('click',applyUploads);
   setupUZ('uzProg','fiProg',true);
