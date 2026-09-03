@@ -370,6 +370,12 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
         <div class="upload-info" id="uiCurs"><strong id="uiCursName"></strong><span id="uiCursSize" style="color:#aaa"></span></div>
       </div>
     </div>
+    <div style="margin-top:14px;border-top:1px dashed #e5e5e5;padding-top:14px">
+      <div style="font-size:.72rem;font-weight:700;color:#3B8F8C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Talent Mapping (opcional)</div>
+      <div class="upload-zone" id="uzTalent"><div class="upload-zone-icon">&#128202;</div><div class="upload-zone-text">Talent Mapping (.xlsx o .csv)</div><div class="upload-zone-sub">Arrastra o haz click &mdash; columnas: ID SF, Clasif. Calibrada (Promotor/Neutro/Detractor), Potencial</div></div>
+      <input type="file" id="fiTalent" accept=".xlsx,.xls,.csv" style="display:none">
+      <div class="upload-info" id="uiTalent"><strong id="uiTalentName"></strong><span id="uiTalentSize" style="color:#aaa"></span></div>
+    </div>
     <div id="modalStorageInfo" style="margin-top:12px;background:#f8f8f8;border-radius:8px;padding:10px 14px;font-size:.76rem;color:#666;line-height:1.7"></div>
     <!-- Access log - only shown to global -->
     <div id="accessLogSection" style="display:none;margin-top:14px;border-top:1px dashed #e5e5e5;padding-top:14px">
@@ -753,7 +759,7 @@ table.detail-table th.sort-desc::after{content:' \25BC';font-size:.6rem;color:#E
       <div id="rmProfile" style="display:none">
         <div style="background:#fff;border:1px solid #eee;border-radius:14px;padding:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
           <div>
-            <div style="font-weight:700;font-size:1rem;color:#333" id="rmPName">-</div>
+            <div style="font-weight:700;font-size:1rem;color:#333;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span id="rmPName">-</span><span id="rmPTalentBadges" style="display:inline-flex;gap:6px;align-items:center"></span></div>
             <div style="font-size:.78rem;color:#888;margin-top:2px">Legajo <span id="rmPLegajo">-</span> &nbsp;|&nbsp; Unidad de Negocio: <span id="rmPPais">-</span> &nbsp;|&nbsp; Distrito: <span id="rmPDistrito">-</span> &nbsp;|&nbsp; Tienda: <span id="rmPTienda">-</span> &nbsp;|&nbsp; Ingreso: <span id="rmPIngreso">-</span></div>
           </div>
           <button onclick="rmClearPerson()" style="background:#f5f5f5;border:1px solid #e0e0e0;padding:6px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;color:#888">Cambiar persona</button>
@@ -920,7 +926,7 @@ var BASE={orange:'#E97132',purple:'#AE90C3',yellow:'#F5F378'};
 var CF=null,CU=null,PS=50;
 var P_SORT={col:null,dir:0}; // col=field name, dir=0 none,1 asc,-1 desc
 var C_SORT={col:null,dir:0};
-var pendProg=null,pendCurs=null;
+var pendProg=null,pendCurs=null,pendTalent=null;
 var EXCLUDE_STAFF=false;  // toggle state for Programas
 var EXCLUDE_STAFF_C=false; // toggle state for Cursos
 
@@ -1382,8 +1388,10 @@ function getStorageInfo(){
   var info='';
   if(cP&&cP.meta&&cP.meta.fileName) info+='Programas: '+cP.meta.fileName+' ('+cP.meta.loadTime+')<br>';
   else info+='Programas: sin datos guardados<br>';
-  if(cC&&cC.meta&&cC.meta.fileName) info+='Cursos: '+cC.meta.fileName+' ('+cC.meta.loadTime+')';
-  else info+='Cursos: sin datos guardados';
+  if(cC&&cC.meta&&cC.meta.fileName) info+='Cursos: '+cC.meta.fileName+' ('+cC.meta.loadTime+')<br>';
+  else info+='Cursos: sin datos guardados<br>';
+  if(T.meta&&T.meta.fileName) info+='Talent Mapping: '+T.meta.fileName+' ('+T.meta.loadTime+', '+T.raw.length+' registros)';
+  else info+='Talent Mapping: sin datos guardados';
   return info;
 }
 
@@ -1676,7 +1684,7 @@ function doLogin(){
 function doLogout(){
   // Clear in-memory state only — localStorage data cache persists for next login
   P=makeState(P.cfg);C=makeState(C.cfg);
-  pendProg=null;pendCurs=null;CF=null;CU=null;SCOPE_BYPASS=false;
+  pendProg=null;pendCurs=null;pendTalent=null;CF=null;CU=null;SCOPE_BYPASS=false;
   try{localStorage.removeItem('xtc_session_user');}catch(e){}
   g('dashboardScreen').style.display='none';
   g('loginScreen').style.display='flex';
@@ -1716,6 +1724,9 @@ function enterDash(){
   });
   restoreData(false, function(){
     refreshTabCurs();
+  });
+  restoreTalentData(function(){
+    if(typeof RM_SELECTED_LEGAJO!=='undefined' && RM_SELECTED_LEGAJO) rmRenderTimeline(RM_SELECTED_LEGAJO);
   });
   showTabProg();
 }
@@ -1867,9 +1878,9 @@ function loadAccessLog(){
 }
 
 function openModal(){
-  pendProg=null;pendCurs=null;
-  g('uiProg').style.display='none';g('uiCurs').style.display='none';
-  g('fiProg').value='';g('fiCurs').value='';
+  pendProg=null;pendCurs=null;pendTalent=null;
+  g('uiProg').style.display='none';g('uiCurs').style.display='none';g('uiTalent').style.display='none';
+  g('fiProg').value='';g('fiCurs').value='';g('fiTalent').value='';
   g('modalStorageInfo').innerHTML = getStorageInfo();
   var logSection=g('accessLogSection');
   if(logSection){
@@ -1879,13 +1890,13 @@ function openModal(){
   g('uploadModal').style.display='flex';
 }
 function closeModal(){g('uploadModal').style.display='none';}
-function setupUZ(zoneId,inputId,isProg){
+function setupUZ(zoneId,inputId,handler){
   var z=g(zoneId),inp=g(inputId);
   z.addEventListener('click',function(){inp.click();});
   z.addEventListener('dragover',function(e){e.preventDefault();z.classList.add('dragover');});
   z.addEventListener('dragleave',function(){z.classList.remove('dragover');});
-  z.addEventListener('drop',function(e){e.preventDefault();z.classList.remove('dragover');var f=e.dataTransfer.files[0];if(f)setUpFile(f,isProg);});
-  inp.addEventListener('change',function(e){if(e.target.files[0])setUpFile(e.target.files[0],isProg);});
+  z.addEventListener('drop',function(e){e.preventDefault();z.classList.remove('dragover');var f=e.dataTransfer.files[0];if(f)handler(f);});
+  inp.addEventListener('change',function(e){if(e.target.files[0])handler(e.target.files[0]);});
 }
 function setUpFile(file,isProg){
   if(!file.name.match(/\.(xlsx|xls|csv)$/i)){alert('Selecciona un archivo Excel (.xlsx o .xls)');return;}
@@ -1893,15 +1904,21 @@ function setUpFile(file,isProg){
   if(isProg){pendProg=file;g('uiProgName').textContent=file.name;g('uiProgSize').textContent=' - '+sz;g('uiProg').style.display='block';}
   else{pendCurs=file;g('uiCursName').textContent=file.name;g('uiCursSize').textContent=' - '+sz;g('uiCurs').style.display='block';}
 }
+function setUpTalentFile(file){
+  if(!file.name.match(/\.(xlsx|xls|csv)$/i)){alert('Selecciona un archivo Excel (.xlsx o .xls)');return;}
+  var sz=(file.size/1024).toFixed(1)+' KB';
+  pendTalent=file;g('uiTalentName').textContent=file.name;g('uiTalentSize').textContent=' - '+sz;g('uiTalent').style.display='block';
+}
 
 function applyUploads(){
-  if(!pendProg&&!pendCurs){alert('Selecciona al menos un archivo.');return;}
+  if(!pendProg&&!pendCurs&&!pendTalent){alert('Selecciona al menos un archivo.');return;}
   closeModal();
   g('loadingOverlay').style.display='flex';
   g('loadingText').textContent='Procesando archivos...';
   var queue=[];
   if(pendProg)queue.push({file:pendProg,isProg:true});
   if(pendCurs)queue.push({file:pendCurs,isProg:false});
+  if(pendTalent)queue.push({file:pendTalent,isTalent:true});
   processQueue(queue,0);
 }
 function processQueue(queue,idx){
@@ -1909,11 +1926,16 @@ function processQueue(queue,idx){
     // Hide loading immediately — don't wait for Supabase sync
     g('loadingOverlay').style.display='none';
     refreshTabProg();refreshTabCurs();
-    // Process talent if pending
-
+    // Refresh the currently-selected Recorrido person, if any, so the new
+    // Talent Mapping badges (P/N/D + Desarrollo) show up immediately.
+    if(typeof RM_SELECTED_LEGAJO!=='undefined' && RM_SELECTED_LEGAJO) rmRenderTimeline(RM_SELECTED_LEGAJO);
     return;
   }
-  setTimeout(function(){readExcel(queue[idx].file,queue[idx].isProg,function(){processQueue(queue,idx+1);});},50);
+  var item=queue[idx];
+  setTimeout(function(){
+    if(item.isTalent) readTalentExcel(item.file,function(){processQueue(queue,idx+1);});
+    else readExcel(item.file,item.isProg,function(){processQueue(queue,idx+1);});
+  },50);
 }
 // ── CSV parser (no dependencies, handles quoted fields + \n inside cells) ──
 function parseCSVtoRows(text){
@@ -2978,10 +3000,23 @@ function mkPag(divId,state,tp,renderFn){
 // ============================================================
 
 // ============================================================
-var T={raw:[],joined:[],page:1},T_PS=50;
+// ============================================================
+// TALENT MAPPING — badges P/N/D (Clasif. Calibrada) + Desarrollo SI/NO
+// que se muestran junto al nombre de la persona en "Recorrido de
+// Aprendizaje". Se carga desde un Excel/CSV aparte (tercera zona del
+// modal "Gestionar datos", solo Global) y se cruza por Legajo — en el
+// archivo de origen esa columna se llama "ID SF" (SuccessFactors), el
+// mismo identificador que en Programas/Cursos se guarda como "legajo".
+// ============================================================
+var T={raw:[],byLegajo:{},meta:{}};
 function mapTalentRow(headers,row){
-  var map={};for(var i=0;i<headers.length;i++)map[headers[i].toString().trim().toLowerCase().replace(/[^a-z0-9]/g,'')]=String(row[i]||'').trim();
-  return{legajo:map['legajo']||map['nrodocumento']||map['id']||'',matchCult:map['matchcultural']||map['match']||'',potencial:map['potencialdedesarrollo']||map['potencial']||''};
+  var map={};for(var i=0;i<headers.length;i++)map[nH(headers[i])]=String(row[i]||'').trim();
+  var legajo=gV(map,['id sf','idsf','legajo','nro documento','id']);
+  var claseRaw=normUpper(gV(map,['clasif calibrada','clasificacion calibrada','match cultural','match']));
+  var matchCult = claseRaw.indexOf('PROMOTOR')>=0?'P':claseRaw.indexOf('DETRACTOR')>=0?'D':(claseRaw.indexOf('NEUTRO')>=0||claseRaw.indexOf('NEUTRAL')>=0)?'N':(claseRaw==='P'||claseRaw==='N'||claseRaw==='D'?claseRaw:'');
+  var potRaw=normUpper(gV(map,['potencial','potencial de desarrollo']));
+  var potencial = potRaw==='SI'?'SI':potRaw==='NO'?'NO':'';
+  return{legajo:legajo,matchCult:matchCult,potencial:potencial};
 }
 
 function readExcelRaw(file,cb){
@@ -2997,6 +3032,102 @@ function readExcelRaw(file,cb){
   };
   reader.onerror=function(){g('loadingOverlay').style.display='none';alert('Error leyendo el archivo.');cb([]);};
   isCSV?reader.readAsText(file,'UTF-8'):reader.readAsArrayBuffer(file);
+}
+
+// ── Talent Mapping: parseo + guardado (independiente de Programas/Cursos,
+// reutiliza readExcelRaw() para leer el archivo y sbRequest/uploadToStorage
+// para persistir en el mismo bucket de Supabase que Programas/Cursos) ──
+function readTalentExcel(file,cb){
+  readExcelRaw(file,function(rows){
+    try{
+      if(!rows||rows.length<2){
+        alert('El archivo '+file.name+' no tiene datos suficientes.');
+        cb();return;
+      }
+      var headers=rows[0].map(function(h){return String(h||'').trim();});
+      var mapped=[];
+      for(var i=1;i<rows.length;i++){
+        var cleanRow=rows[i].map(function(v){return String(v===null||v===undefined?'':v).trim();});
+        var r=mapTalentRow(headers,cleanRow);
+        if(r.legajo)mapped.push(r);
+      }
+      if(!mapped.length){
+        alert('No se detectaron registros validos en '+file.name+'.\nVerifica que tenga columnas ID SF, Clasif. Calibrada y Potencial.');
+        cb();return;
+      }
+      var now=new Date();
+      var meta={fileName:file.name,loadTime:now.toLocaleString('es-AR'),updateDateFull:fmtFechaLarga(now),rowCount:mapped.length};
+      applyTalentData(mapped,meta);
+      cb();
+      sbSaveTalent(mapped,meta,function(){});
+    }catch(err){
+      console.error(err);
+      alert('Error procesando '+file.name+': '+err.message);
+      cb();
+    }
+  });
+}
+function applyTalentData(rows,meta){
+  T.raw=rows;
+  T.meta=meta;
+  T.byLegajo={};
+  rows.forEach(function(r){ if(r.legajo) T.byLegajo[r.legajo]=r; });
+  var infoEl=g('modalStorageInfo');
+  if(infoEl && infoEl.innerHTML) infoEl.innerHTML=getStorageInfo();
+}
+function compactTalentRow(r){ return [r.legajo,r.matchCult,r.potencial]; }
+function expandTalentRow(a){ return {legajo:a[0],matchCult:a[1],potencial:a[2]}; }
+function sbSaveTalent(rows,meta,onDone){
+  var lsKey='xtc_sb_talent';
+  var compact=rows.map(compactTalentRow);
+  try{ localStorage.setItem(lsKey, JSON.stringify({rows:compact,meta:meta})); }catch(e){}
+  var payload=JSON.stringify({rows:compact,meta:meta,totalRows:compact.length});
+  uploadToStorage('talent.json', payload, function(ok){ if(onDone)onDone(ok); });
+}
+function sbLoadTalent(onDone){
+  var lsKey='xtc_sb_talent';
+  var url=SB_URL+'/storage/v1/object/public/dashboard-files/talent.json?t='+Date.now();
+  var xhr=new XMLHttpRequest();
+  xhr.open('GET',url);
+  xhr.timeout=15000;
+  xhr.onload=function(){
+    if(xhr.status===200){
+      try{
+        var data=JSON.parse(xhr.responseText);
+        var rows=(data.rows||[]).map(expandTalentRow);
+        try{ localStorage.setItem(lsKey, JSON.stringify({rows:data.rows||[],meta:data.meta||{}})); }catch(e){}
+        onDone(200,null,{rows:rows,meta:data.meta||{}});
+      }catch(e){ fallbackToLS(); }
+    }else{ fallbackToLS(); }
+  };
+  xhr.onerror=xhr.ontimeout=function(){ fallbackToLS(); };
+  xhr.send();
+  function fallbackToLS(){
+    try{
+      var raw=localStorage.getItem(lsKey);
+      if(raw){
+        var cached=JSON.parse(raw);
+        if(cached&&cached.rows&&cached.rows.length){
+          onDone(200,null,{rows:cached.rows.map(expandTalentRow),meta:cached.meta||{}});
+          return;
+        }
+      }
+    }catch(e){}
+    onDone(0,null,{rows:[],meta:{}});
+  }
+}
+function restoreTalentData(onDone){
+  try{
+    var raw=localStorage.getItem('xtc_sb_talent');
+    if(raw){
+      var cached=JSON.parse(raw);
+      if(cached&&cached.rows&&cached.rows.length) applyTalentData(cached.rows.map(expandTalentRow),cached.meta||{});
+    }
+  }catch(e){}
+  sbLoadTalent(function(status,err,data){
+    if(status===200&&data&&data.rows&&data.rows.length) applyTalentData(data.rows,data.meta||{});
+    if(onDone)onDone();
+  });
 }
 
 
@@ -3582,8 +3713,9 @@ document.addEventListener('DOMContentLoaded',function(){
   g('btnScopeBypass').addEventListener('click',toggleScopeBypass);
   g('btnCloseModal').addEventListener('click',closeModal);
   g('btnLoadModal').addEventListener('click',applyUploads);
-  setupUZ('uzProg','fiProg',true);
-  setupUZ('uzCurs','fiCurs',false);
+  setupUZ('uzProg','fiProg',function(f){setUpFile(f,true);});
+  setupUZ('uzCurs','fiCurs',function(f){setUpFile(f,false);});
+  setupUZ('uzTalent','fiTalent',function(f){setUpTalentFile(f);});
   // Prog
   g('pBtnClear').addEventListener('click',pClear);
   g('pBtnMore').addEventListener('click',function(){var sf=g('pSecFilters');sf.classList.toggle('show');g('pMoreIcon').innerHTML=sf.classList.contains('show')?'&#9650;':'&#9660;';});
@@ -4226,6 +4358,28 @@ var RM_WARN_DAYS=10; // avisar N días antes del vencimiento de una etapa
 function rmAddDays(d,n){ var r=new Date(d.getTime()); r.setDate(r.getDate()+n); return r; }
 function rmStartOfDay(d){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
 
+// Talent Mapping: badges "Desarrollo: SI/NO" + Clasif. Calibrada (Promotor/Neutro/
+// Detractor) que se muestran junto al nombre de la persona seleccionada, cruzando
+// por legajo (= "ID SF" en el archivo de Talent Mapping) contra T.byLegajo.
+var RM_TALENT_MATCH_META={
+  P:{bg:'#EAF3DE',fg:'#3B6D11',icon:'😃',label:'Promotor'},
+  N:{bg:'#F0F0F0',fg:'#666',icon:'😐',label:'Neutro'},
+  D:{bg:'#FCEBEB',fg:'#A32D2D',icon:'😟',label:'Detractor'}
+};
+function rmTalentBadgesHtml(legajo){
+  var t=T.byLegajo?T.byLegajo[legajo]:null;
+  if(!t) return '';
+  var html='';
+  if(t.potencial==='SI'||t.potencial==='NO'){
+    var ok=t.potencial==='SI';
+    html+='<span style="font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;background:'+(ok?'#EAF3DE':'#FCEBEB')+';color:'+(ok?'#3B6D11':'#A32D2D')+'">Desarrollo: '+t.potencial+'</span>';
+  }
+  if(t.matchCult && RM_TALENT_MATCH_META[t.matchCult]){
+    var m=RM_TALENT_MATCH_META[t.matchCult];
+    html+='<span title="'+m.label+'" style="font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;background:'+m.bg+';color:'+m.fg+'">'+m.icon+' '+t.matchCult+'</span>';
+  }
+  return html;
+}
 function rmRenderTimeline(legajo){
   var progRows=P.raw.filter(function(r){return r.legajo===legajo;});
   var cursRows=C.raw.filter(function(r){return r.legajo===legajo;});
@@ -4242,6 +4396,7 @@ function rmRenderTimeline(legajo){
   var segmento='';
   progRows.concat(cursRows).some(function(r){ if(r.segmento){segmento=r.segmento;return true;} return false; });
   g('rmPName').textContent=person.nombre||'(sin nombre)';
+  var rmBadgesEl=g('rmPTalentBadges'); if(rmBadgesEl) rmBadgesEl.innerHTML=rmTalentBadgesHtml(legajo);
   g('rmPLegajo').textContent=legajo;
   g('rmPPais').textContent=person.pais||'-';
   g('rmPDistrito').textContent=person.distrito||'-';
